@@ -26,9 +26,9 @@ const Markets: React.FC = () => {
   ]);
 
   const [animatePrices, setAnimatePrices] = useState(false);
-  const [totalMarketCap, setTotalMarketCap] = useState('2.45T');
-  const [btcDominance, setBtcDominance] = useState('54.2%');
-  const [volume24h, setVolume24h] = useState('89.4B');
+  const totalMarketCap = '2.45T';
+  const btcDominance = '54.2%';
+  const volume24h = '89.4B';
 
   useEffect(() => {
     const interval = setInterval(() => {

@@ -16,34 +16,34 @@ const Portfolio: React.FC = () => {
       return;
     }
 
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/auth/profile', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+          return;
+        }
+
+        const data = await response.json();
+        setUser(data);
+        setActiveInvestments(data.activeInvestments);
+        setCompletedInvestments(data.completedInvestments);
+      } catch (error) {
+        setError('Error fetching portfolio data. Please try again.');
+        console.error('Error fetching user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchUserData();
   }, [navigate]);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/auth/profile', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/login');
-        return;
-      }
-
-      const data = await response.json();
-      setUser(data);
-      setActiveInvestments(data.activeInvestments);
-      setCompletedInvestments(data.completedInvestments);
-    } catch (error) {
-      setError('Error fetching portfolio data. Please try again.');
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return <div className="loading">Loading...</div>;

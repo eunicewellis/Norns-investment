@@ -37,30 +37,28 @@ const KYC: React.FC = () => {
   });
 
   useEffect(() => {
-    checkKycStatus();
-  }, []);
-
-  const checkKycStatus = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:5000/kyc/status', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setKycStatus(data.status);
+    const checkStatus = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
       }
-    } catch (err) {
-      console.error('Error checking KYC status:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        const response = await fetch('http://localhost:5000/kyc/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setKycStatus(data.status);
+        }
+      } catch (err) {
+        console.error('Error checking KYC status:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkStatus();
+  }, [navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

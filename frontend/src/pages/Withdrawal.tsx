@@ -18,30 +18,30 @@ const Withdrawal: React.FC = () => {
       return;
     }
 
+    const fetchMethods = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/withdrawals/methods', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+          return;
+        }
+
+        const data = await response.json();
+        setMethods(data);
+      } catch (error) {
+        setError('Error fetching withdrawal methods. Please try again.');
+        console.error('Error fetching withdrawal methods:', error);
+      }
+    };
+
     fetchMethods();
   }, [navigate]);
-
-  const fetchMethods = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/withdrawals/methods', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/login');
-        return;
-      }
-
-      const data = await response.json();
-      setMethods(data);
-    } catch (error) {
-      setError('Error fetching withdrawal methods. Please try again.');
-      console.error('Error fetching withdrawal methods:', error);
-    }
-  };
 
   const handleMethodSelect = (method: any) => {
     setSelectedMethod(method);
