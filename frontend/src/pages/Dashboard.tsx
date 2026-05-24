@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Quick Actions + Portfolio Overview */}
-      <div style={{display:'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '28px'}}>
+      <div className="dashboard-quick-row" style={{display:'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '28px'}}>
         <div className="dashboard-card">
           <div className="dashboard-card-header">
             <h3><i className="fas fa-bolt" style={{color:'var(--accent-primary)', marginRight:8}}></i>Quick Actions</h3>

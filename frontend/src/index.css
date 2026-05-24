@@ -1557,7 +1557,7 @@ ul { list-style: none; }
   .dashboard-card { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .dashboard-card-header h3 { font-size: 0.9rem; white-space: nowrap; }
   .dashboard-card-header { flex-wrap: nowrap; gap: 8px; }
-  .dashboard > div[style*="gridTemplateColumns:"] { grid-template-columns: 1fr !important; }
+  .dashboard-quick-row { grid-template-columns: 1fr !important; }
   .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
   .quick-action-btn { padding: 12px; font-size: 0.8rem; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
