@@ -1,7 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
 const Investment = require('../models/Investment');
-const { v4: uuidv4 } = require('uuid');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
@@ -49,14 +48,18 @@ router.post('/create', auth, async (req, res) => {
     }
 
     // Validate amount
-    if (amount <= 0) {
+    if (!amount || amount <= 0) {
       return res.status(400).json({ message: 'Invalid amount' });
     }
 
-    // Check minimum and maximum limits
-    const methods = await router.get('/methods');
-    const selectedMethod = methods.find(m => m.type === method);
+    // Check method limits
+    const methodsMap = {
+      'Bank Transfer': { minAmount: 100, maxAmount: 10000, processingTime: '3-5 business days' },
+      'Cryptocurrency': { minAmount: 50, maxAmount: 5000, processingTime: '1-2 business days' },
+      'E-Wallet': { minAmount: 20, maxAmount: 2000, processingTime: '24 hours' }
+    };
 
+    const selectedMethod = methodsMap[method];
     if (!selectedMethod) {
       return res.status(400).json({ message: 'Invalid withdrawal method' });
     }
@@ -74,23 +77,34 @@ router.post('/create', auth, async (req, res) => {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
 
-    // Create withdrawal request
-    const withdrawal = {
-      id: uuidv4(),
+    // Create withdrawal record in DB
+    const withdrawal = new Investment({
+      userId: user._id,
+      type: 'withdrawal',
       method,
       amount,
-      walletAddress,
+      walletAddress: walletAddress || '',
       status: 'pending',
-      createdAt: new Date()
-    };
+      planType: 'Deposit'
+    });
 
-    // For demo purposes, auto-approve withdrawal
+    await withdrawal.save();
+
+    // Deduct user balance
     user.balance -= amount;
+    user.totalWithdrawn = (user.totalWithdrawn || 0) + amount;
     await user.save();
 
     res.json({
       message: 'Withdrawal request created successfully',
-      withdrawal,
+      withdrawal: {
+        id: withdrawal._id,
+        method: withdrawal.method,
+        amount: withdrawal.amount,
+        walletAddress: withdrawal.walletAddress,
+        status: withdrawal.status,
+        createdAt: withdrawal.createdAt
+      },
       newBalance: user.balance,
       processingTime: selectedMethod.processingTime
     });
@@ -103,29 +117,10 @@ router.post('/create', auth, async (req, res) => {
 router.get('/user', auth, async (req, res) => {
   try {
     const decoded = req.user;
-    const user = await User.findById(decoded.userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // For demo purposes, return fake withdrawal history
-    const withdrawals = [
-      {
-        id: uuidv4(),
-        method: 'Bank Transfer',
-        amount: 1000,
-        status: 'completed',
-        createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000)
-      },
-      {
-        id: uuidv4(),
-        method: 'Cryptocurrency',
-        amount: 0.05,
-        status: 'completed',
-        createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000)
-      }
-    ];
+    const withdrawals = await Investment.find({
+      userId: decoded.userId,
+      type: 'withdrawal'
+    }).sort({ createdAt: -1 });
 
     res.json(withdrawals);
   } catch (error) {

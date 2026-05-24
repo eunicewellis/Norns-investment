@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import API_BASE_URL from '../config';
 
 interface User {
   _id: string;
@@ -54,12 +55,13 @@ const Admin: React.FC = () => {
       return;
     }
     checkAdminAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const checkAdminAuth = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/admin/check', {
+      const res = await fetch(`${API_BASE_URL}/admin/check`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -79,9 +81,9 @@ const Admin: React.FC = () => {
       const headers = { 'Authorization': `Bearer ${token}` };
 
       const [usersRes, transRes, methodsRes] = await Promise.all([
-        fetch('http://localhost:5000/admin/users', { headers }),
-        fetch('http://localhost:5000/admin/transactions', { headers }),
-        fetch('http://localhost:5000/admin/deposit-methods', { headers })
+        fetch(`${API_BASE_URL}/admin/users`, { headers }),
+        fetch(`${API_BASE_URL}/admin/transactions`, { headers }),
+        fetch(`${API_BASE_URL}/admin/deposit-methods`, { headers })
       ]);
 
       if (usersRes.ok) {
@@ -106,7 +108,7 @@ const Admin: React.FC = () => {
   const handleStatusUpdate = async (id: string, type: 'deposit' | 'withdrawal', status: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/admin/${type}/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/admin/${type}/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +126,7 @@ const Admin: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
-      const res = await fetch(`http://localhost:5000/admin/users/${userId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

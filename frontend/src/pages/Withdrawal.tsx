@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../config';
 
 const Withdrawal: React.FC = () => {
   const [methods, setMethods] = useState([]);
@@ -20,7 +21,7 @@ const Withdrawal: React.FC = () => {
 
     const fetchMethods = async () => {
       try {
-        const response = await fetch('http://localhost:5000/withdrawals/methods', {
+        const response = await fetch(`${API_BASE_URL}/withdrawals/methods`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -70,7 +71,7 @@ const Withdrawal: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/withdrawals/create', {
+      const response = await fetch(`${API_BASE_URL}/withdrawals/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

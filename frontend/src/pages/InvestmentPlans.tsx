@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../config';
 
 interface Plan {
   id: string;
@@ -27,7 +28,7 @@ const InvestmentPlans: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await fetch('http://localhost:5000/investments/plans');
+        const response = await fetch(`${API_BASE_URL}/investments/plans`);
         const data = await response.json();
         setPlans(data);
       } catch (error) {
@@ -59,7 +60,7 @@ const InvestmentPlans: React.FC = () => {
 
     setIsInvesting(true);
     try {
-      const response = await fetch('http://localhost:5000/investments/create', {
+      const response = await fetch(`${API_BASE_URL}/investments/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

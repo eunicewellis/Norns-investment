@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../config';
 
 const KYC: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -44,7 +45,7 @@ const KYC: React.FC = () => {
         return;
       }
       try {
-        const response = await fetch('http://localhost:5000/kyc/status', {
+        const response = await fetch(`${API_BASE_URL}/kyc/status`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -87,7 +88,7 @@ const KYC: React.FC = () => {
       if (documents.selfie) formPayload.append('selfie', documents.selfie);
       if (documents.proofOfAddress) formPayload.append('proofOfAddress', documents.proofOfAddress);
 
-      const response = await fetch('http://localhost:5000/kyc/submit', {
+      const response = await fetch(`${API_BASE_URL}/kyc/submit`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formPayload,

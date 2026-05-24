@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../config';
 
 const Referral: React.FC = () => {
   const [referralCode, setReferralCode] = useState('');
@@ -45,7 +46,7 @@ const Referral: React.FC = () => {
   const fetchReferralData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/referral/stats', {
+      const response = await fetch(`${API_BASE_URL}/referral/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

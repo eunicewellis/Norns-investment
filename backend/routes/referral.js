@@ -4,7 +4,45 @@ const { v4: uuidv4 } = require('uuid');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// Get referral information
+// Get referral information (stats endpoint used by frontend)
+router.get('/stats', auth, async (req, res) => {
+  try {
+    const decoded = req.user;
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Get referral statistics
+    const referredUsers = await User.find({ referredBy: user.referralCode });
+    const totalDeposits = referredUsers.reduce((sum, u) => sum + (u.totalDeposited || 0), 0);
+
+    const activeReferrals = referredUsers.filter(u => u.status === 'active').length;
+
+    res.json({
+      code: user.referralCode,
+      stats: {
+        totalReferrals: referredUsers.length,
+        activeReferrals,
+        totalEarned: totalDeposits * 0.1,
+        pendingCommissions: totalDeposits * 0.05
+      },
+      referrals: referredUsers.map(u => ({
+        name: `${u.firstName} ${u.lastName}`,
+        dateJoined: u.createdAt,
+        depositAmount: u.totalDeposited || 0,
+        commission: (u.totalDeposited || 0) * 0.1,
+        status: u.status
+      })),
+      commissionRate: '10%'
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get referral information (original endpoint)
 router.get('/info', auth, async (req, res) => {
   try {
     const decoded = req.user;
@@ -16,7 +54,7 @@ router.get('/info', auth, async (req, res) => {
 
     // Get referral statistics
     const referredUsers = await User.find({ referredBy: user.referralCode });
-    const totalDeposits = referredUsers.reduce((sum, user) => sum + user.balance, 0);
+    const totalDeposits = referredUsers.reduce((sum, u) => sum + (u.totalDeposited || 0), 0);
 
     res.json({
       referralCode: user.referralCode,

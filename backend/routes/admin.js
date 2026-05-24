@@ -9,9 +9,24 @@ const router = express.Router();
 // Admin login
 router.post('/login', async (req, res) => {
   try {
-    const { password } = req.body;
+    const { email, password } = req.body;
+
+    // Check if user exists and is admin
+    if (email) {
+      const user = await User.findOne({ email, isAdmin: true });
+      if (user) {
+        const token = jwt.sign(
+          { userId: user._id, admin: true },
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRE }
+        );
+        return res.json({ message: 'Admin login successful', token, user: { id: user._id, email: user.email } });
+      }
+    }
+
+    // Fallback to password-only auth for backward compatibility
     if (password !== process.env.ADMIN_PASSWORD) {
-      return res.status(400).json({ message: 'Invalid password' });
+      return res.status(400).json({ message: 'Invalid admin credentials' });
     }
     const token = jwt.sign(
       { admin: true },

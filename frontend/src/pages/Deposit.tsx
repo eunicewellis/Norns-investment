@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from '../config';
 
 const Deposit: React.FC = () => {
   const [methods, setMethods] = useState<any[]>([]);
@@ -21,11 +22,12 @@ const Deposit: React.FC = () => {
       return;
     }
     fetchMethods();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const fetchMethods = async () => {
     try {
-      const response = await fetch('http://localhost:5000/deposits/methods');
+      const response = await fetch(`${API_BASE_URL}/deposits/methods`);
       if (response.status === 401) {
         localStorage.removeItem('token');
         navigate('/login');
@@ -78,7 +80,7 @@ const Deposit: React.FC = () => {
         payload.walletAddress = selectedMethod.walletAddress;
       }
 
-      const response = await fetch('http://localhost:5000/deposits/create', {
+      const response = await fetch(`${API_BASE_URL}/deposits/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import API_BASE_URL from '../config';
 
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeInvestments, setActiveInvestments] = useState([]);
-  const [completedInvestments, setCompletedInvestments] = useState([]);
+  const [, setCompletedInvestments] = useState([]);
   const [stats, setStats] = useState({
     totalProfit: 0,
     totalInvested: 0,
@@ -23,11 +24,12 @@ const Dashboard: React.FC = () => {
     }
 
     fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/auth/profile', {
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
