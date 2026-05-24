@@ -32,9 +32,10 @@ const Navbar: React.FC = () => {
 
   const getLinks = () => {
     const baseLinks = [
-      { p: '/about', l: 'About' }, { p: '/plans', l: 'Plans' },
-      { p: '/markets', l: 'Markets' }, { p: '/blog', l: 'Blog' },
-      { p: '/faq', l: 'FAQ' }, { p: '/support', l: 'Support' }
+      { p: '/about', l: 'About' },
+      { p: '/markets', l: 'Markets' },
+      { p: '/faq', l: 'FAQ' },
+      { p: '/support', l: 'Support' }
     ];
     if (isLoggedIn) {
       return [{ p: '/dashboard', l: 'Dashboard' }, ...baseLinks];

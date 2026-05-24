@@ -5,9 +5,7 @@ import './App.css';
 // Pages
 import Home from './pages/Home';
 import About from './pages/About';
-import InvestmentPlans from './pages/InvestmentPlans';
 import Markets from './pages/Markets';
-import Blog from './pages/Blog';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +25,7 @@ import Admin from './pages/Admin';
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
 function HomeOrRedirect() {
   const token = localStorage.getItem('token');
@@ -40,14 +39,13 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <ScrollToTop />
         <Navbar />
         <main>
           <Routes>
             <Route path="/" element={<HomeOrRedirect />} />
             <Route path="/about" element={<About />} />
-            <Route path="/plans" element={<InvestmentPlans />} />
             <Route path="/markets" element={<Markets />} />
-            <Route path="/blog" element={<Blog />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />

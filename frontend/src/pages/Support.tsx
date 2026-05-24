@@ -38,13 +38,13 @@ const Support: React.FC = () => {
 
       {/* Quick Contact Methods */}
       <div className="grid-3" style={{ marginBottom: '48px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto' }}>
-        <a href="mailto:support@binexelite.com" className="card card-hover" style={{ textAlign: 'center', padding: '32px 20px', textDecoration: 'none' }}>
+        <a href="mailto:votearoos@gmail.com" className="card card-hover" style={{ textAlign: 'center', padding: '32px 20px', textDecoration: 'none' }}>
           <div className="feature-icon" style={{ margin: '0 auto 16px' }}>
             <i className="fas fa-envelope"></i>
           </div>
           <h3 style={{ fontWeight: 700, marginBottom: '8px' }}>Email Support</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '12px' }}>Get a response within 24 hours</p>
-          <span style={{ color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>support@binexelite.com</span>
+          <span style={{ color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>votearoos@gmail.com</span>
         </a>
         <a href="https://telegram.org" target="_blank" rel="noopener noreferrer" className="card card-hover" style={{ textAlign: 'center', padding: '32px 20px', textDecoration: 'none' }}>
           <div className="feature-icon" style={{ margin: '0 auto 16px' }}>

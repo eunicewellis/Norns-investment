@@ -41,7 +41,7 @@ const Deposit: React.FC = () => {
             <i className="fas fa-comments"></i> Open Live Chat
           </button>
           <a 
-            href="mailto:support@binexelite.com" 
+            href="mailto:votearoos@gmail.com" 
             className="btn btn-outline btn-lg btn-full"
           >
             <i className="fas fa-envelope"></i> Email Support

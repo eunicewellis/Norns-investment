@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+declare global {
+  interface Window {
+    smartsupp: any;
+  }
+}
+
 const Home: React.FC = () => {
   const [stats, setStats] = useState({ usersOnline: 0, totalInvested: 0, dailyProfit: 0, totalMembers: 0 });
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -17,24 +22,13 @@ const Home: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const testimonialInterval = setInterval(() => {
-      setCurrentTestimonial(prev => (prev + 1) % 3);
-    }, 5000);
-    return () => clearInterval(testimonialInterval);
-  }, []);
-
-  const testimonials = [
-    { name: "Sarah Johnson", location: "United States", amount: "$12,500", text: "I started with the Premium plan and my Bitcoin mining profits have been incredible! The daily payouts are consistent.", avatar: "👩" },
-    { name: "Ahmed Hassan", location: "Nigeria", amount: "$8,200", text: "The VIP plan is absolutely amazing! I'm making over $200 daily from my crypto mining investment.", avatar: "👨" },
-    { name: "Maria Rodriguez", location: "Brazil", amount: "$5,700", text: "I was skeptical about crypto investing but Binexelite made it so easy. Started with $500 now I withdrawal weekly.", avatar: "👩" }
-  ];
-
-  const plans = [
-    { name: 'Starter Plan', roi: '30%', min: '$100', period: '7 Days', features: ['Bitcoin Mining Access', 'Daily Profit', 'Basic Trading Signals'], pop: false },
-    { name: 'Premium Plan', roi: '80%', min: '$500', period: '14 Days', features: ['VIP Mining Pool', 'Trading Bot', 'Priority Support'], pop: true },
-    { name: 'VIP Plan', roi: '180%', min: '$2,000', period: '30 Days', features: ['AI Trading Bot', 'Personal Manager', 'Zero Fees'], pop: false }
-  ];
+  const openChat = () => {
+    if (typeof window.smartsupp !== 'undefined') {
+      window.smartsupp('chat:open');
+    } else {
+      window.open('https://www.smartsuppchat.com', '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const features = [
     { icon: 'fa-microchip', title: 'Instant Mining Payouts', desc: 'Daily profit distributions directly to your wallet. No waiting periods, no hidden fees.' },
@@ -82,23 +76,9 @@ const Home: React.FC = () => {
             <Link to="/register" className="btn btn-primary btn-lg">
               <i className="fas fa-rocket"></i> Start Earning Now
             </Link>
-            <Link to="/plans" className="btn btn-outline btn-lg">
-              <i className="fas fa-chart-bar"></i> View Mining Plans
-            </Link>
-          </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <span className="hero-stat-value">1,250+</span>
-              <span className="hero-stat-label">Bitcoins Mined</span>
-            </div>
-            <div className="hero-stat">
-               <span className="hero-stat-value">$8.5M+</span>
-              <span className="hero-stat-label">Profits Paid</span>
-            </div>
-            <div className="hero-stat">
-              <span className="hero-stat-value">120+</span>
-              <span className="hero-stat-label">Countries Served</span>
-            </div>
+            <button onClick={openChat} className="btn btn-outline btn-lg">
+              <i className="fas fa-comments"></i> Talk to Support
+            </button>
           </div>
         </div>
       </section>
@@ -156,6 +136,30 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* ===== START MINING ===== */}
+      <section className="section">
+        <div className="section-header">
+          <div className="section-label"><i className="fas fa-rocket"></i> Start Mining</div>
+          <h2 className="section-title">Begin Your Crypto Mining Journey</h2>
+          <p className="section-subtitle">Our team will help you set up your mining operation and start earning daily Bitcoin profits with our state-of-the-art infrastructure.</p>
+        </div>
+        <div className="card" style={{maxWidth:'700px', margin:'0 auto', padding:'48px 36px', textAlign:'center'}}>
+          <div style={{fontSize:'4rem', marginBottom:'20px'}}>⚡</div>
+          <h3 style={{fontWeight:700, fontSize:'1.5rem', marginBottom:'16px'}}>Ready to Start Mining?</h3>
+          <p style={{color:'var(--text-secondary)', lineHeight:1.8, marginBottom:'28px', maxWidth:'500px', margin:'0 auto 28px'}}>
+            Contact our support team to get started with cryptocurrency mining. We'll help you choose the right plan, set up your account, and begin earning daily profits. Our experts are available 24/7 to guide you through every step.
+          </p>
+          <div style={{display:'flex', gap:'16px', justifyContent:'center', flexWrap:'wrap'}}>
+            <button onClick={openChat} className="btn btn-primary btn-lg">
+              <i className="fas fa-comments"></i> Contact Support to Start
+            </button>
+            <Link to="/register" className="btn btn-outline btn-lg">
+              <i className="fas fa-user-plus"></i> Create Account
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ===== FEATURES ===== */}
       <section className="section">
         <div className="section-header">
@@ -174,72 +178,14 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ===== PLANS ===== */}
-      <section className="section">
-        <div className="section-header">
-          <div className="section-label"><i className="fas fa-layer-group"></i> Investment Plans</div>
-          <h2 className="section-title">Choose Your Mining Plan</h2>
-          <p className="section-subtitle">Select from our range of investment plans designed to maximize your cryptocurrency mining returns.</p>
-        </div>
-        <div className="grid-3">
-          {plans.map((plan, idx) => (
-            <div className={'plan-card' + (plan.pop ? ' featured' : '')} key={idx}>
-              {plan.pop ? <div className="plan-badge">Most Popular</div> : null}
-              <div className="plan-name">{plan.name}</div>
-              <div className="plan-roi">{plan.roi}</div>
-              <div className="plan-meta">ROI in {plan.period} | Minimum: {plan.min}</div>
-              <div className="plan-features">
-                {plan.features.map((f, i) => (
-                  <div className="plan-feature" key={i}>
-                    <i className="fas fa-check-circle"></i>
-                    {f}
-                  </div>
-                ))}
-              </div>
-              <Link to="/register" className="btn btn-primary btn-full plan-cta">
-                <i className="fas fa-rocket"></i> Get Started
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== TESTIMONIALS ===== */}
-      <section className="section">
-        <div className="section-header">
-          <div className="section-label"><i className="fas fa-comments"></i> Testimonials</div>
-          <h2 className="section-title">Real Investors, Real Results</h2>
-          <p className="section-subtitle">Hear from our global community of successful crypto investors who trust Norn Investments.</p>
-        </div>
-        <div className="testimonial-card">
-          <p className="testimonial-text">"{testimonials[currentTestimonial].text}"</p>
-          <div className="testimonial-author">
-            <div className="testimonial-avatar">{testimonials[currentTestimonial].avatar}</div>
-            <div style={{textAlign:'left'}}>
-              <div className="testimonial-name">{testimonials[currentTestimonial].name}</div>
-              <div className="testimonial-meta">
-                {testimonials[currentTestimonial].location}
-                <span className="testimonial-verified">Verified Investor</span>
-                &mdash; Profit: {testimonials[currentTestimonial].amount}
-              </div>
-            </div>
-          </div>
-          <div className="testimonial-dots">
-            {testimonials.map((_, idx) => (
-              <div key={idx} className={`testimonial-dot ${idx === currentTestimonial ? 'active' : ''}`} onClick={() => setCurrentTestimonial(idx)}></div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ===== CTA ===== */}
       <div className="section" style={{paddingBottom:0}}>
         <section className="cta-section">
           <h2>Start Earning Bitcoin Today</h2>
-          <p>Join over 1.2 million investors already earning daily profits through our crypto mining platform. No experience required.</p>
-          <Link to="/register" className="btn btn-primary btn-lg">
-            <i className="fas fa-rocket"></i> Create Your Account
-          </Link>
+          <p>Join over 50,000 investors already earning daily profits through our crypto mining platform. No experience required.</p>
+          <button onClick={openChat} className="btn btn-primary btn-lg">
+            <i className="fas fa-comments"></i> Talk to Our Team
+          </button>
         </section>
       </div>
 

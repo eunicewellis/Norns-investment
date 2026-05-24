@@ -1538,6 +1538,19 @@ ul { list-style: none; }
   .admin-nav-item span:not(.fa-icon) { font-size: 0.8rem; }
   .charts-grid { grid-template-columns: 1fr; }
   .auth-card { padding: 28px 24px; }
+  /* Dashboard mobile responsive */
+  .dashboard-card { padding: 16px; }
+  .dashboard-card-header h3 { font-size: 0.95rem; }
+  .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+  .quick-action-btn { padding: 12px; font-size: 0.8rem; }
+  .coin-info .coin-icon { width: 28px; height: 28px; font-size: 0.8rem; }
+  .coin-name { font-size: 0.8rem; }
+  .coin-symbol { font-size: 0.65rem; }
+  .market-table th, .market-table td { padding: 8px 10px; font-size: 0.75rem; }
+  .investment-card { padding: 14px; }
+  .withdrawal-grid { grid-template-columns: 1fr; }
+  .deposit-methods-grid { grid-template-columns: repeat(2, 1fr); }
+  .tab-container { overflow-x: auto; }
 }
 
 /* ===== KYC PAGE ===== */
