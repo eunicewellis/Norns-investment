@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 
 const About: React.FC = () => {
   const stats = [
-    { value: '2018', label: 'Founded' },
-    { value: '1.2M+', label: 'Investors' },
-    { value: '150+', label: 'Countries' },
-    { value: '$12M+', label: 'Profits Paid' },
+    { value: '2020', label: 'Founded' },
+    { value: '50K+', label: 'Investors' },
+    { value: '120+', label: 'Countries' },
+    { value: '$8.5M+', label: 'Profits Paid' },
   ];
 
   const team = [
@@ -21,7 +21,7 @@ const About: React.FC = () => {
       <div className="section-header" style={{textAlign:'center', marginBottom:'48px'}}>
         <div className="section-label"><i className="fas fa-info-circle"></i> About Us</div>
         <h1 className="section-title">Leading the Future of Crypto Mining</h1>
-        <p className="section-subtitle">Norn Investments is a global investment platform serving investors worldwide since 2018. We combine cutting-edge technology with financial expertise.</p>
+        <p className="section-subtitle">Binexelite is a global investment platform serving investors worldwide since 2020. We combine cutting-edge technology with financial expertise to optimize digital asset generation.</p>
       </div>
 
       <div className="stats-grid" style={{marginBottom:'48px'}}>
@@ -40,10 +40,10 @@ const About: React.FC = () => {
         <div>
           <h2 style={{fontSize:'1.8rem', fontWeight:700, marginBottom:'16px'}}>Our Mission</h2>
           <p style={{color:'var(--text-secondary)', lineHeight:1.8, marginBottom:'16px'}}>
-            At Norn Investments, we are democratizing access to cryptocurrency mining and investment opportunities. Our platform enables anyone, anywhere to earn daily profits through our state-of-the-art mining infrastructure.
+            At Binexelite, we are democratizing access to cryptocurrency mining and investment opportunities. Our platform enables anyone, anywhere to earn daily profits through our state-of-the-art mining infrastructure.
           </p>
           <p style={{color:'var(--text-secondary)', lineHeight:1.8, marginBottom:'24px'}}>
-            With mining operations across three continents and an AI-powered trading system that operates 24/7, we deliver consistent returns that outperform traditional investment vehicles.
+            With mining operations across three continents and an AI-powered trading system that operates 24/7, we deliver consistent returns through intelligent hash-power allocation and automated mining strategies.
           </p>
           <Link to="/register" className="btn btn-primary"><i className="fas fa-rocket"></i> Start Investing</Link>
         </div>

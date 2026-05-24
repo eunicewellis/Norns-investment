@@ -27,7 +27,7 @@ const Home: React.FC = () => {
   const testimonials = [
     { name: "Sarah Johnson", location: "United States", amount: "$12,500", text: "I started with the Premium plan and my Bitcoin mining profits have been incredible! The daily payouts are consistent.", avatar: "👩" },
     { name: "Ahmed Hassan", location: "Nigeria", amount: "$8,200", text: "The VIP plan is absolutely amazing! I'm making over $200 daily from my crypto mining investment.", avatar: "👨" },
-    { name: "Maria Rodriguez", location: "Brazil", amount: "$5,700", text: "I was skeptical about crypto investing but Norn made it so easy. Started with $500 now I withdrawal weekly.", avatar: "👩" }
+    { name: "Maria Rodriguez", location: "Brazil", amount: "$5,700", text: "I was skeptical about crypto investing but Binexelite made it so easy. Started with $500 now I withdrawal weekly.", avatar: "👩" }
   ];
 
   const plans = [
@@ -74,10 +74,10 @@ const Home: React.FC = () => {
         <div className="hero-content">
           <div className="hero-badge">
             <i className="fas fa-users"></i>
-            Trusted by 1.2M+ Investors Worldwide
+            Trusted by 50K+ Investors Worldwide
           </div>
           <h1>Invest in <span>Cryptocurrency Mining</span><br />& Earn Daily Profits</h1>
-          <p>Join the future of wealth creation. Norn Investments provides AI-powered crypto mining and trading solutions that generate consistent daily returns.</p>
+          <p>Advanced cryptocurrency mining and investment platform built to optimize digital asset generation through intelligent hash-power allocation, automated mining strategies, and real-time Bitcoin market analytics.</p>
           <div className="hero-actions">
             <Link to="/register" className="btn btn-primary btn-lg">
               <i className="fas fa-rocket"></i> Start Earning Now
@@ -88,15 +88,15 @@ const Home: React.FC = () => {
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
-              <span className="hero-stat-value">2,450+</span>
+              <span className="hero-stat-value">1,250+</span>
               <span className="hero-stat-label">Bitcoins Mined</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">$12M+</span>
+               <span className="hero-stat-value">$8.5M+</span>
               <span className="hero-stat-label">Profits Paid</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">150+</span>
+              <span className="hero-stat-value">120+</span>
               <span className="hero-stat-label">Countries Served</span>
             </div>
           </div>

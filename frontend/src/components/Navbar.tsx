@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
             <span className="navbar-logo-icon">
               <i className="fas fa-chart-line"></i>
             </span>
-            <span className="navbar-logo-text">NORNS</span>
+            <span className="navbar-logo-text">BINEXELITE</span>
           </Link>
 
           <div className="navbar-links">
@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
       <div className={`mobile-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}></div>
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
         <div className="mobile-menu-header">
-          <span className="navbar-logo-text">NORNS</span>
+          <span className="navbar-logo-text">BINEXELITE</span>
           <button className="mobile-menu-close" onClick={() => setIsMenuOpen(false)} aria-label="Close menu">
             <i className="fas fa-times"></i>
           </button>

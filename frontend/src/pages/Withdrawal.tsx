@@ -1,69 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import API_BASE_URL from '../config';
 
+const countries = [
+  'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'United States', 'United Kingdom',
+  'Canada', 'Australia', 'India', 'Brazil', 'Mexico', 'Germany', 'France',
+  'Spain', 'Italy', 'Netherlands', 'Switzerland', 'Sweden', 'Norway', 'Denmark',
+  'Finland', 'Belgium', 'Austria', 'Ireland', 'Portugal', 'Poland', 'Czech Republic',
+  'Turkey', 'UAE', 'Saudi Arabia', 'Egypt', 'Morocco', 'Algeria', 'Tunisia',
+  'Senegal', 'Ivory Coast', 'Cameroon', 'Zambia', 'Zimbabwe', 'Botswana',
+  'Philippines', 'Indonesia', 'Malaysia', 'Thailand', 'Vietnam', 'Singapore',
+  'Argentina', 'Chile', 'Colombia', 'Peru', 'Venezuela'
+];
+
 const Withdrawal: React.FC = () => {
-  const [methods, setMethods] = useState([]);
-  const [selectedMethod, setSelectedMethod] = useState<any>(null);
   const [amount, setAmount] = useState('');
-  const [walletAddress, setWalletAddress] = useState('');
+  const [country, setCountry] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [accountName, setAccountName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [routingNumber, setRoutingNumber] = useState('');
+  const [swiftCode, setSwiftCode] = useState('');
+  const [iban, setIban] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchMethods = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/withdrawals/methods`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        if (response.status === 401) {
-          localStorage.removeItem('token');
-          navigate('/login');
-          return;
-        }
-
-        const data = await response.json();
-        setMethods(data);
-      } catch (error) {
-        setError('Error fetching withdrawal methods. Please try again.');
-        console.error('Error fetching withdrawal methods:', error);
-      }
-    };
-
-    fetchMethods();
-  }, [navigate]);
-
-  const handleMethodSelect = (method: any) => {
-    setSelectedMethod(method);
-    setAmount(method.minAmount.toString());
-    setError('');
-    setSuccess('');
-  };
 
   const handleWithdrawal = async () => {
-    if (!amount || parseFloat(amount) < selectedMethod.minAmount) {
-      setError(`Minimum amount for ${selectedMethod.type} is $${selectedMethod.minAmount}`);
+    if (!amount || parseFloat(amount) < 50) {
+      setError('Minimum withdrawal amount is $50');
       return;
     }
-
-    if (parseFloat(amount) > selectedMethod.maxAmount) {
-      setError(`Maximum amount for ${selectedMethod.type} is $${selectedMethod.maxAmount}`);
+    if (!country) {
+      setError('Please select your country');
       return;
     }
-
-    if (selectedMethod.type === 'Cryptocurrency' && !walletAddress) {
-      setError('Please enter your crypto wallet address');
+    if (!bankName || !accountName || !accountNumber) {
+      setError('Please fill in all required bank details');
       return;
     }
 
@@ -78,16 +50,24 @@ const Withdrawal: React.FC = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          method: selectedMethod.type,
+          method: 'Bank Transfer',
           amount: parseFloat(amount),
-          walletAddress: selectedMethod.type === 'Cryptocurrency' ? walletAddress : null
+          walletAddress: JSON.stringify({
+            country,
+            bankName,
+            accountName,
+            accountNumber,
+            routingNumber: routingNumber || undefined,
+            swiftCode: swiftCode || undefined,
+            iban: iban || undefined
+          })
         })
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(`Withdrawal request for $${parseFloat(amount).toLocaleString()} ${selectedMethod.type} submitted successfully!`);
+        setSuccess(`Withdrawal request for $${parseFloat(amount).toLocaleString()} submitted successfully! Our team will process it shortly.`);
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 3000);
@@ -105,115 +85,141 @@ const Withdrawal: React.FC = () => {
     <div className="withdrawal-page">
       <div className="page-header">
         <h1>Request Withdrawal</h1>
-        <p>Choose your preferred withdrawal method and receive your funds</p>
+        <p>Submit a withdrawal request — funds are sent via bank transfer to your local bank account</p>
       </div>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
-      <div className="withdrawal-grid">
-        <div className="withdrawal-methods">
-          <h3>Select Withdrawal Method</h3>
-          <div className="methods-list">
-            {methods.map((method: any) => (
-              <div 
-                className={`method-card ${selectedMethod?.type === method.type ? 'selected' : ''}`}
-                key={method.type}
-                onClick={() => handleMethodSelect(method)}
-              >
-                <div className="method-icon">
-                  {method.type === 'Bank Transfer' && '🏦'}
-                  {method.type === 'Cryptocurrency' && '₿'}
-                  {method.type === 'E-Wallet' && '📱'}
-                </div>
-                <div className="method-details">
-                  <h4>{method.type}</h4>
-                  <p>{method.description}</p>
-                  <p className="processing-time">Processing Time: {method.processingTime}</p>
-                </div>
-              </div>
+      <div className="card" style={{maxWidth:'680px', margin:'0 auto', padding:'40px 32px'}}>
+        <h3 style={{fontWeight: 700, marginBottom: '24px'}}>
+          <i className="fas fa-university" style={{color:'var(--accent-primary)', marginRight:8}}></i>
+          Bank Transfer Details
+        </h3>
+
+        <div className="form-group">
+          <label className="form-label">Amount (USD)</label>
+          <input
+            type="number"
+            className="form-input"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Enter amount (min: $50)"
+            min={50}
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Select Country</label>
+          <select 
+            className="form-select" 
+            value={country} 
+            onChange={(e) => setCountry(e.target.value)}
+          >
+            <option value="">Select your country...</option>
+            {countries.map(c => (
+              <option key={c} value={c}>{c}</option>
             ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Bank Name</label>
+          <input
+            type="text"
+            className="form-input"
+            value={bankName}
+            onChange={(e) => setBankName(e.target.value)}
+            placeholder="e.g. First Bank, Chase, Barclays"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Account Holder Name</label>
+          <input
+            type="text"
+            className="form-input"
+            value={accountName}
+            onChange={(e) => setAccountName(e.target.value)}
+            placeholder="Full name on bank account"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Account Number</label>
+          <input
+            type="text"
+            className="form-input"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
+            placeholder="Enter your account number"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Routing / Sort Code <span style={{color:'var(--text-tertiary)'}}>(optional)</span></label>
+          <input
+            type="text"
+            className="form-input"
+            value={routingNumber}
+            onChange={(e) => setRoutingNumber(e.target.value)}
+            placeholder="Routing number or sort code"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">SWIFT / BIC Code <span style={{color:'var(--text-tertiary)'}}>(optional, for international)</span></label>
+          <input
+            type="text"
+            className="form-input"
+            value={swiftCode}
+            onChange={(e) => setSwiftCode(e.target.value)}
+            placeholder="e.g. BOFAUS3N"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">IBAN <span style={{color:'var(--text-tertiary)'}}>(optional, Europe)</span></label>
+          <input
+            type="text"
+            className="form-input"
+            value={iban}
+            onChange={(e) => setIban(e.target.value)}
+            placeholder="International Bank Account Number"
+          />
+        </div>
+
+        <div className="withdrawal-summary" style={{margin:'24px 0'}}>
+          <h4>Withdrawal Summary</h4>
+          <div className="summary-item">
+            <span>Withdrawal Method:</span>
+            <span>Bank Transfer</span>
+          </div>
+          <div className="summary-item">
+            <span>Amount:</span>
+            <span>${parseFloat(amount || '0').toLocaleString()}</span>
+          </div>
+          <div className="summary-item">
+            <span>Processing Fee:</span>
+            <span>0%</span>
+          </div>
+          <div className="summary-item">
+            <span>Processing Time:</span>
+            <span>24-72 hours</span>
           </div>
         </div>
 
-        {selectedMethod && (
-          <div className="withdrawal-form">
-            <h3>Withdraw via {selectedMethod.type}</h3>
-            <p>{selectedMethod.instructions}</p>
-            
-            <div className="form-group">
-              <label htmlFor="amount">Amount</label>
-              <input
-                type="number"
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder={`Enter amount ($${selectedMethod.minAmount} - $${selectedMethod.maxAmount})`}
-                className="form-control"
-              />
-              <div className="amount-limits">
-                <span>Minimum: ${selectedMethod.minAmount}</span>
-                <span>Maximum: ${selectedMethod.maxAmount}</span>
-              </div>
-            </div>
+        <button 
+          className="btn btn-primary btn-lg btn-full"
+          onClick={handleWithdrawal}
+          disabled={isLoading || !amount || !country || !bankName || !accountName || !accountNumber}
+        >
+          {isLoading ? '⏳ Processing...' : '📤 Submit Withdrawal Request'}
+        </button>
 
-            {selectedMethod.type === 'Cryptocurrency' && (
-              <div className="form-group">
-                <label htmlFor="walletAddress">Wallet Address</label>
-                <input
-                  type="text"
-                  id="walletAddress"
-                  value={walletAddress}
-                  onChange={(e) => setWalletAddress(e.target.value)}
-                  placeholder="Enter your crypto wallet address"
-                  className="form-control"
-                />
-              </div>
-            )}
-
-            <div className="withdrawal-summary">
-              <h4>Withdrawal Summary</h4>
-              <div className="summary-item">
-                <span>Withdrawal Method:</span>
-                <span>{selectedMethod.type}</span>
-              </div>
-              <div className="summary-item">
-                <span>Amount:</span>
-                <span>${parseFloat(amount).toLocaleString()}</span>
-              </div>
-              <div className="summary-item">
-                <span>Processing Time:</span>
-                <span>{selectedMethod.processingTime}</span>
-              </div>
-              <div className="summary-item">
-                <span>Processing Fee:</span>
-                <span>0.5%</span>
-              </div>
-              <div className="summary-item">
-                <span>You Will Receive:</span>
-                <span>${(parseFloat(amount) * 0.995).toLocaleString()}</span>
-              </div>
-            </div>
-
-            <button 
-              className="btn btn-success btn-full btn-lg"
-              onClick={handleWithdrawal}
-              disabled={
-                isLoading || 
-                !amount || 
-                parseFloat(amount) < selectedMethod.minAmount ||
-                parseFloat(amount) > selectedMethod.maxAmount ||
-                (selectedMethod.type === 'Cryptocurrency' && !walletAddress)
-              }
-            >
-              {isLoading ? 'Processing...' : 'Submit Withdrawal Request'}
-            </button>
-
-            <div className="security-notice">
-              <p>🔒 All withdrawals are processed securely and verified for your protection</p>
-            </div>
-          </div>
-        )}
+        <div className="security-notice" style={{marginTop:'16px'}}>
+          🔒 Your bank details are encrypted and securely stored. All withdrawals are verified for your protection.
+        </div>
       </div>
     </div>
   );

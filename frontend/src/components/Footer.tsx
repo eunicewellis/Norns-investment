@@ -7,10 +7,10 @@ const Footer: React.FC = () => {
       <div className="footer-inner">
         <div className="footer-brand">
           <div className="footer-brand-text">
-            <span className="navbar-logo-text">NORNS</span>
+            <span className="navbar-logo-text">BINEXELITE</span>
           </div>
           <p className="footer-desc">
-            Premium cryptocurrency mining and investment platform powered by AI technology. Start earning daily profits with our cutting-edge infrastructure.
+            Advanced cryptocurrency mining and investment platform built to optimize digital asset generation through intelligent hash-power allocation, automated mining strategies, and real-time Bitcoin market analytics.
           </p>
           <div className="footer-social">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">
@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Norn Investments. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Binexelite. All rights reserved.</p>
         <div className="footer-badges">
           <span><i className="fas fa-lock"></i> 256-bit SSL</span>
           <span><i className="fas fa-bolt"></i> Instant Withdrawals</span>
