@@ -1,12 +1,11 @@
 {
   "name": "norns-investment",
   "version": "1.0.0",
-  "description": "Norns Investment Platform - Crypto Mining & Trading",
+  "description": "Binexelite - Crypto Mining & Investment Platform",
   "scripts": {
-    "start": "cd backend && node server.js",
-    "build": "cd frontend && npm install && npm run build",
-    "dev": "cd backend && node server.js",
-    "postinstall": "cd backend && npm install"
+    "start": "cd backend && npm install && node server.js",
+    "build": "echo 'Frontend is deployed separately on Vercel'",
+    "dev": "cd backend && node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
