@@ -1557,7 +1557,7 @@ ul { list-style: none; }
   .dashboard-card { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .dashboard-card-header h3 { font-size: 0.9rem; white-space: nowrap; }
   .dashboard-card-header { flex-wrap: nowrap; gap: 8px; }
-  .dashboard > div[style*="gridTemplateColumns: '1fr 1fr'"] { grid-template-columns: 1fr !important; }
+  .dashboard > div[style*="gridTemplateColumns:"] { grid-template-columns: 1fr !important; }
   .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
   .quick-action-btn { padding: 12px; font-size: 0.8rem; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -1568,7 +1568,7 @@ ul { list-style: none; }
   .coin-info .coin-icon { width: 28px; height: 28px; font-size: 0.8rem; flex-shrink: 0; }
   .coin-name { font-size: 0.8rem; }
   .coin-symbol { font-size: 0.65rem; }
-  .table th, .table td { padding: 8px 8px; font-size: 0.7rem; }
+  .table th, .table td { padding: 8px 6px; font-size: 0.65rem; white-space: nowrap; }
   .investment-card { padding: 14px; }
   .withdrawal-grid { grid-template-columns: 1fr; }
   .deposit-methods-grid { grid-template-columns: repeat(2, 1fr); }
