@@ -1,0 +1,13 @@
+{
+  "name": "norns-investment",
+  "version": "1.0.0",
+  "description": "Norns Investment Platform - Crypto Mining & Trading",
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "cd backend && node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
