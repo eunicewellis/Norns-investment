@@ -34,7 +34,7 @@ const Support: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/support/ticket', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'https://norns-investment.up.railway.app'}/support/ticket`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
