@@ -30,11 +30,17 @@ const Navbar: React.FC = () => {
     navigate('/');
   };
 
-  const links = [
-    { p: '/', l: 'Home' }, { p: '/about', l: 'About' }, { p: '/plans', l: 'Plans' },
-    { p: '/markets', l: 'Markets' }, { p: '/blog', l: 'Blog' },
-    { p: '/faq', l: 'FAQ' }, { p: '/support', l: 'Support' }
-  ];
+  const getLinks = () => {
+    const baseLinks = [
+      { p: '/about', l: 'About' }, { p: '/plans', l: 'Plans' },
+      { p: '/markets', l: 'Markets' }, { p: '/blog', l: 'Blog' },
+      { p: '/faq', l: 'FAQ' }, { p: '/support', l: 'Support' }
+    ];
+    if (isLoggedIn) {
+      return [{ p: '/dashboard', l: 'Dashboard' }, ...baseLinks];
+    }
+    return [{ p: '/', l: 'Home' }, ...baseLinks];
+  };
 
   return (
     <>
@@ -48,7 +54,7 @@ const Navbar: React.FC = () => {
           </Link>
 
           <div className="navbar-links">
-            {links.map(l => (
+            {getLinks().map(l => (
               <Link key={l.p} to={l.p} className={`navbar-link ${location.pathname === l.p ? 'active' : ''}`}>
                 {l.l}
               </Link>
@@ -57,10 +63,7 @@ const Navbar: React.FC = () => {
               <i className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'}`}></i>
             </button>
             {isLoggedIn ? (
-              <>
-                <Link to="/dashboard" className="btn btn-ghost btn-sm">Dashboard</Link>
-                <button className="btn btn-primary btn-sm" onClick={handleLogout}>Logout</button>
-              </>
+              <button className="btn btn-primary btn-sm" onClick={handleLogout}>Logout</button>
             ) : (
               <>
                 <Link to="/login" className="btn btn-ghost btn-sm">Login</Link>
@@ -84,7 +87,7 @@ const Navbar: React.FC = () => {
           </button>
         </div>
 
-        {links.map(l => (
+        {getLinks().map(l => (
           <Link key={l.p} to={l.p} className={`mobile-link ${location.pathname === l.p ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
             {l.l}
           </Link>

@@ -206,6 +206,73 @@ const Dashboard: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
+      {/* Market Prices */}
+      <div className="dashboard-card" style={{marginBottom:'28px'}}>
+        <div className="dashboard-card-header">
+          <h3><i className="fas fa-chart-line" style={{color:'var(--accent-primary)', marginRight:8}}></i>Market Prices</h3>
+          <Link to="/markets" style={{fontSize:'0.85rem',color:'var(--accent-primary)',fontWeight:600}}>View All <i className="fas fa-arrow-right"></i></Link>
+        </div>
+        <div className="table-container">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>24h Change</th>
+                <th>Volume</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="coin-info">
+                  <span className="coin-icon" style={{background:'#f7931a'}}>₿</span>
+                  <div><span className="coin-name">Bitcoin</span><span className="coin-symbol">BTC</span></div>
+                </td>
+                <td className="price green">$67,845.32</td>
+                <td><span className="change-badge up">▲ 2.45%</span></td>
+                <td>$28.4B</td>
+              </tr>
+              <tr>
+                <td className="coin-info">
+                  <span className="coin-icon" style={{background:'#627eea'}}>♦</span>
+                  <div><span className="coin-name">Ethereum</span><span className="coin-symbol">ETH</span></div>
+                </td>
+                <td className="price green">$3,456.78</td>
+                <td><span className="change-badge up">▲ 3.12%</span></td>
+                <td>$15.2B</td>
+              </tr>
+              <tr>
+                <td className="coin-info">
+                  <span className="coin-icon" style={{background:'#00ffa3'}}>◎</span>
+                  <div><span className="coin-name">Solana</span><span className="coin-symbol">SOL</span></div>
+                </td>
+                <td className="price green">$142.50</td>
+                <td><span className="change-badge up">▲ 5.67%</span></td>
+                <td>$3.8B</td>
+              </tr>
+              <tr>
+                <td className="coin-info">
+                  <span className="coin-icon" style={{background:'#0033ad'}}>₳</span>
+                  <div><span className="coin-name">Cardano</span><span className="coin-symbol">ADA</span></div>
+                </td>
+                <td className="price red">$0.456</td>
+                <td><span className="change-badge down">▼ 1.23%</span></td>
+                <td>$1.2B</td>
+              </tr>
+              <tr>
+                <td className="coin-info">
+                  <span className="coin-icon" style={{background:'#23292f'}}>✕</span>
+                  <div><span className="coin-name">XRP</span><span className="coin-symbol">XRP</span></div>
+                </td>
+                <td className="price green">$0.623</td>
+                <td><span className="change-badge up">▲ 1.89%</span></td>
+                <td>$2.1B</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Active Investments */}
       <div className="dashboard-card" style={{marginBottom:'28px'}}>
         <div className="dashboard-card-header">

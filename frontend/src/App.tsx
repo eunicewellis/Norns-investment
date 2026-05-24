@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
 // Pages
@@ -28,6 +28,14 @@ import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
+function HomeOrRedirect() {
+  const token = localStorage.getItem('token');
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Home />;
+}
+
 function App() {
   return (
     <Router>
@@ -35,7 +43,7 @@ function App() {
         <Navbar />
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomeOrRedirect />} />
             <Route path="/about" element={<About />} />
             <Route path="/plans" element={<InvestmentPlans />} />
             <Route path="/markets" element={<Markets />} />
