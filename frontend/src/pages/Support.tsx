@@ -1,8 +1,18 @@
 import React from 'react';
 
+declare global {
+  interface Window {
+    smartsupp: any;
+  }
+}
+
 const Support: React.FC = () => {
-  const openSmartsupp = () => {
-    window.open('https://www.smartsupp.com', '_blank', 'noopener,noreferrer');
+  const openChat = () => {
+    if (typeof window.smartsupp !== 'undefined') {
+      window.smartsupp('chat:open');
+    } else {
+      window.open('https://www.smartsuppchat.com', '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -13,15 +23,15 @@ const Support: React.FC = () => {
         <p className="section-subtitle">Our dedicated support team is here to assist you with any questions or issues.</p>
       </div>
 
-      {/* Main Support Card */}
+      {/* Main Live Chat Card */}
       <div className="card" style={{maxWidth: '680px', margin: '0 auto 48px', padding: '48px 32px', textAlign: 'center'}}>
-        <div style={{fontSize: '4rem', marginBottom: '20px'}}>💬</div>
+        <div style={{fontSize: '4rem', marginBottom: '20px'}}>&#x1F4AC;</div>
         <h2 style={{fontWeight: 700, marginBottom: '12px'}}>Chat with Our Support Team</h2>
         <p style={{color: 'var(--text-secondary)', marginBottom: '28px', lineHeight: 1.7}}>
           Get instant help from our support team via live chat. We're available 24/7 to assist you 
           with deposits, withdrawals, investments, and any other questions you may have.
         </p>
-        <button className="btn btn-primary btn-lg" onClick={openSmartsupp}>
+        <button className="btn btn-primary btn-lg" onClick={openChat}>
           <i className="fas fa-comments"></i> Start Live Chat
         </button>
       </div>
@@ -44,7 +54,7 @@ const Support: React.FC = () => {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '12px' }}>Join our community group</p>
           <span style={{ color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>@BinexeliteSupport</span>
         </a>
-        <button onClick={openSmartsupp} className="card card-hover" style={{ textAlign: 'center', padding: '32px 20px', textDecoration: 'none', cursor: 'pointer', border: '1px solid var(--border-primary)', background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', width: '100%' }}>
+        <button onClick={openChat} className="card card-hover" style={{ textAlign: 'center', padding: '32px 20px', textDecoration: 'none', cursor: 'pointer', border: '1px solid var(--border-primary)', background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', width: '100%' }}>
           <div className="feature-icon" style={{ margin: '0 auto 16px' }}>
             <i className="fas fa-comments"></i>
           </div>
@@ -59,7 +69,7 @@ const Support: React.FC = () => {
         <h2><i className="fas fa-clock"></i> Support Hours</h2>
         <p>Our team is available 24/7 for urgent issues. Standard support is available Monday through Friday, 9 AM - 6 PM EST.</p>
         <div className="trust-bar">
-          <span className="trust-badge"><i className="fas fa-check-circle"></i> 24/7 Emergency Support</span>
+          <span className="trust-badge"><i className="fas fa-check-circle"></i> 24/7 Live Chat</span>
           <span className="trust-badge"><i className="fas fa-check-circle"></i> Average 2hr Response</span>
           <span className="trust-badge"><i className="fas fa-check-circle"></i> 98% Satisfaction Rate</span>
           <span className="trust-badge"><i className="fas fa-check-circle"></i> Multilingual Team</span>
