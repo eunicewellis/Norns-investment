@@ -169,15 +169,15 @@ const Dashboard: React.FC = () => {
         <div className="stat-card">
           <div className="stat-icon amber"><i className="fas fa-layer-group"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{stats.activeCount}</div>
+            <div className="stat-value">${stats.totalInvested.toLocaleString()}</div>
             <div className="stat-label">Active Investments</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon purple"><i className="fas fa-trophy"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{stats.completedCount}</div>
-            <div className="stat-label">Completed Investments</div>
+            <div className="stat-value">{stats.activeCount}</div>
+            <div className="stat-label">Number of Investments</div>
           </div>
         </div>
       </div>
