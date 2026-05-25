@@ -21,6 +21,7 @@ const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
     totalProfit: 0,
     totalInvested: 0,
+    totalWithdrawn: 0,
     activeCount: 0,
     completedCount: 0
   });
@@ -92,6 +93,7 @@ const Dashboard: React.FC = () => {
       setStats({
         totalProfit: totalProfit.toFixed(2),
         totalInvested: totalInvested.toFixed(2),
+        totalWithdrawn: data.totalWithdrawn || 0,
         activeCount: data.activeInvestments.length,
         completedCount: data.completedInvestments.length
       });
@@ -176,8 +178,8 @@ const Dashboard: React.FC = () => {
         <div className="stat-card">
           <div className="stat-icon purple"><i className="fas fa-trophy"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{stats.activeCount}</div>
-            <div className="stat-label">Number of Investments</div>
+            <div className="stat-value">${stats.totalWithdrawn.toLocaleString()}</div>
+            <div className="stat-label">Amount Withdrawn</div>
           </div>
         </div>
       </div>
