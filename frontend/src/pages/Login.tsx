@@ -17,9 +17,7 @@ const Login: React.FC = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
@@ -28,6 +26,10 @@ const Login: React.FC = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        // Restore currency from user profile country
+        if (data.user?.country) {
+          localStorage.setItem('binexelite_country', data.user.country);
+        }
         navigate('/dashboard');
       } else {
         setError(data.message);
@@ -43,10 +45,10 @@ const Login: React.FC = () => {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-logo">
+          <div className="auth-logo auth-logo-dark">
             <i className="fas fa-chart-line"></i>
           </div>
-          <h2>Welcome Back</h2>
+          <h2 className="auth-title-gold">Welcome Back</h2>
           <p>Access your investment dashboard and manage your portfolio</p>
         </div>
 
@@ -55,65 +57,29 @@ const Login: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              className="form-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="Enter your email"
-            />
+            <input type="email" id="email" className="form-input" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Enter your email" />
           </div>
-
           <div className="form-group">
             <label className="form-label" htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              className="form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter your password"
-            />
+            <input type="password" id="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Enter your password" />
           </div>
-
           <div className="form-options">
-            <label className="form-remember">
-              <input type="checkbox" /> Remember me
-            </label>
-            <Link to="/forgot-password" className="form-forgot">
-              Forgot Password?
-            </Link>
+            <label className="form-remember"><input type="checkbox" /> Remember me</label>
+            <Link to="/forgot-password" className="form-forgot">Forgot Password?</Link>
           </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary btn-full btn-lg"
-            disabled={isLoading}
-          >
+          <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={isLoading}>
             {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Logging in...</> : 'Login'}
           </button>
         </form>
 
         <div className="auth-divider">or continue with</div>
-
         <div className="auth-social">
-          <button className="auth-social-btn">
-            <i className="fab fa-google"></i> Google
-          </button>
-          <button className="auth-social-btn">
-            <i className="fab fa-facebook-f"></i> Meta
-          </button>
-          <button className="auth-social-btn">
-            <i className="fab fa-apple"></i> Apple
-          </button>
+          <button className="auth-social-btn"><i className="fab fa-google"></i> Google</button>
+          <button className="auth-social-btn"><i className="fab fa-facebook-f"></i> Meta</button>
+          <button className="auth-social-btn"><i className="fab fa-apple"></i> Apple</button>
         </div>
 
-        <div className="auth-footer">
-          Don't have an account? <Link to="/register">Create one here</Link>
-        </div>
+        <div className="auth-footer">Don't have an account? <Link to="/register">Create one here</Link></div>
       </div>
     </div>
   );

@@ -435,7 +435,18 @@ ul { list-style: none; }
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   display: flex; align-items: center; justify-content: center;
   font-size: 1.5rem; font-weight: 800; color: white;
-  box-shadow: 0 0 30px var(--accent-primary-glow);
+}
+.auth-logo-dark {
+  background: linear-gradient(135deg, #121212, #1a1a2e);
+  border: 2px solid var(--accent-primary);
+  color: var(--accent-primary);
+}
+.auth-title-gold {
+  background: linear-gradient(135deg, var(--accent-primary), #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.5rem; font-weight: 700; margin-bottom: 6px;
 }
 .auth-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
 .auth-header p { color: var(--text-secondary); font-size: 0.9rem; }

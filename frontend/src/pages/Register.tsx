@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
+import { countries, getCurrencyForCountry } from '../utils/currency';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const Register: React.FC = () => {
     lastName: '',
     email: '',
     phone: '',
+    country: 'United States',
     password: '',
     confirmPassword: ''
   });
@@ -30,6 +32,11 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Set currency based on country
+    const currency = getCurrencyForCountry(formData.country);
+    localStorage.setItem('binexelite_currency', JSON.stringify(currency));
+    localStorage.setItem('binexelite_country', formData.country);
+
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
@@ -41,7 +48,8 @@ const Register: React.FC = () => {
           lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-          password: formData.password
+          password: formData.password,
+          country: formData.country
         })
       });
 
@@ -65,10 +73,10 @@ const Register: React.FC = () => {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-logo">
-            <i className="fas fa-user-plus"></i>
+          <div className="auth-logo auth-logo-dark">
+            <i className="fas fa-chart-line"></i>
           </div>
-          <h2>Create Account</h2>
+          <h2 className="auth-title-gold">Create Account</h2>
           <p>Start your investment journey with Norn Investments</p>
         </div>
 
@@ -129,6 +137,21 @@ const Register: React.FC = () => {
               onChange={handleChange}
               placeholder="+1 234 567 8900"
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="country">Country</label>
+            <select
+              id="country"
+              name="country"
+              className="form-select"
+              value={formData.country}
+              onChange={handleChange as any}
+            >
+              {countries.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
