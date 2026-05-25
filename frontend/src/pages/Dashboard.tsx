@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import API_BASE_URL from '../config';
 
+declare global {
+  interface Window { smartsupp: any; }
+}
+
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -188,7 +192,7 @@ const Dashboard: React.FC = () => {
               <i className="fas fa-paper-plane"></i>
               Request Withdrawal
             </button>
-            <button className="quick-action-btn" onClick={() => navigate('/plans')}>
+            <button className="quick-action-btn" onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsuppchat.com', '_blank'); }}>
               <i className="fas fa-rocket"></i>
               New Investment
             </button>
@@ -218,7 +222,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="detail-row">
               <span className="detail-label">Account Status</span>
-              <span className="badge badge-primary"><i className="fas fa-check-circle"></i> Verified</span>
+              <span className="badge badge-warning"><i className="fas fa-clock"></i> Unverified</span>
             </div>
           </div>
         </div>
@@ -286,7 +290,7 @@ const Dashboard: React.FC = () => {
             <div style={{textAlign:'center', padding:'32px', color:'var(--text-tertiary)'}}>
               <i className="fas fa-inbox" style={{fontSize:'2rem',marginBottom:'12px',display:'block'}}></i>
               <p style={{marginBottom:'16px'}}>You don't have any active investments yet.</p>
-              <Link to="/plans" className="btn btn-primary">Start Investing</Link>
+              <button onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsuppchat.com', '_blank'); }} className="btn btn-primary">Contact Support</button>
             </div>
           )}
         </div>

@@ -9,13 +9,6 @@ const About: React.FC = () => {
     { value: '$8.5M+', label: 'Profits Paid' },
   ];
 
-  const team = [
-    { name: 'Alexander Chen', role: 'CEO & Founder', avatar: 'AC', bio: '15+ years in fintech and blockchain technology. Former VP at Goldman Sachs.' },
-    { name: 'Sarah Mitchell', role: 'CTO', avatar: 'SM', bio: 'Expert in distributed systems and crypto mining infrastructure. PhD in Computer Science.' },
-    { name: 'David Okafor', role: 'Head of Operations', avatar: 'DO', bio: 'Oversees global mining operations across 5 data centers worldwide.' },
-    { name: 'Elena Rodriguez', role: 'Chief Compliance Officer', avatar: 'ER', bio: 'Ensures regulatory compliance across all jurisdictions we operate in.' },
-  ];
-
   return (
     <div className="page">
       <div className="section-header" style={{textAlign:'center', marginBottom:'48px'}}>
@@ -74,26 +67,6 @@ const About: React.FC = () => {
           <h3>Trust and Integrity</h3>
           <p>Licensed and regulated, with a proven track record of timely payouts and exceptional customer service.</p>
         </div>
-      </div>
-
-      <div className="section-header">
-        <div className="section-label"><i className="fas fa-users"></i> Leadership Team</div>
-        <h2 className="section-title">Meet Our Experts</h2>
-      </div>
-      <div className="grid-auto">
-        {team.map((m, i) => (
-          <div className="card card-hover" key={i} style={{textAlign:'center', padding:'32px 24px'}}>
-            <div style={{
-              width:'72px', height:'72px', borderRadius:'50%', margin:'0 auto 16px',
-              background:'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              color:'white', fontWeight:800, fontSize:'1.3rem'
-            }}>{m.avatar}</div>
-            <h3 style={{fontWeight:700, marginBottom:'4px'}}>{m.name}</h3>
-            <div className="badge badge-primary" style={{marginBottom:'12px'}}>{m.role}</div>
-            <p style={{color:'var(--text-secondary)', fontSize:'0.9rem', lineHeight:1.6}}>{m.bio}</p>
-          </div>
-        ))}
       </div>
     </div>
   );

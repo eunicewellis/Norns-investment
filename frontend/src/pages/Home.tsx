@@ -136,30 +136,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ===== START MINING ===== */}
-      <section className="section">
-        <div className="section-header">
-          <div className="section-label"><i className="fas fa-rocket"></i> Start Mining</div>
-          <h2 className="section-title">Begin Your Crypto Mining Journey</h2>
-          <p className="section-subtitle">Our team will help you set up your mining operation and start earning daily Bitcoin profits with our state-of-the-art infrastructure.</p>
-        </div>
-        <div className="card" style={{maxWidth:'700px', margin:'0 auto', padding:'48px 36px', textAlign:'center'}}>
-          <div style={{fontSize:'4rem', marginBottom:'20px'}}>⚡</div>
-          <h3 style={{fontWeight:700, fontSize:'1.5rem', marginBottom:'16px'}}>Ready to Start Mining?</h3>
-          <p style={{color:'var(--text-secondary)', lineHeight:1.8, marginBottom:'28px', maxWidth:'500px', margin:'0 auto 28px'}}>
-            Contact our support team to get started with cryptocurrency mining. We'll help you choose the right plan, set up your account, and begin earning daily profits. Our experts are available 24/7 to guide you through every step.
-          </p>
-          <div style={{display:'flex', gap:'16px', justifyContent:'center', flexWrap:'wrap'}}>
-            <button onClick={openChat} className="btn btn-primary btn-lg">
-              <i className="fas fa-comments"></i> Contact Support to Start
-            </button>
-            <Link to="/register" className="btn btn-outline btn-lg">
-              <i className="fas fa-user-plus"></i> Create Account
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ===== FEATURES ===== */}
       <section className="section">
         <div className="section-header">

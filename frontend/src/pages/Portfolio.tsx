@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
+
+declare global {
+  interface Window { smartsupp: any; }
+}
 
 const Portfolio: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -139,7 +143,7 @@ const Portfolio: React.FC = () => {
           {activeInvestments.length === 0 && (
             <div className="no-investments">
               <p>You don't have any active investments yet.</p>
-              <Link to="/plans" className="btn btn-primary">Start Investing</Link>
+              <button onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsuppchat.com', '_blank'); }} className="btn btn-primary">Contact Support</button>
             </div>
           )}
         </div>
@@ -184,7 +188,7 @@ const Portfolio: React.FC = () => {
           {completedInvestments.length === 0 && (
             <div className="no-investments">
               <p>You don't have any completed investments yet.</p>
-              <Link to="/plans" className="btn btn-primary">Start Investing</Link>
+              <button onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsuppchat.com', '_blank'); }} className="btn btn-primary">Contact Support</button>
             </div>
           )}
         </div>

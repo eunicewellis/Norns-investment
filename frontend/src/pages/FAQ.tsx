@@ -5,7 +5,7 @@ const FAQ: React.FC = () => {
 
   const faqs = [
     { q: 'How do I start investing?', a: 'Creating an account is free and takes less than 2 minutes. Simply register, complete KYC verification, make a deposit, and choose your investment plan to start earning daily profits.' },
-    { q: 'What is the minimum investment amount?', a: 'Our Starter Plan begins at just $100, making it accessible for everyone. Premium and VIP plans have higher minimums but offer better returns.' },
+    { q: 'What is the minimum investment amount?', a: 'Our Starter Plan begins at just $300, making it accessible for everyone. Premium and VIP plans have higher minimums but offer better returns.' },
     { q: 'How are profits calculated and paid?', a: 'Profits are calculated based on your investment plan percentage and paid daily directly to your account balance. You can withdraw your earnings at any time.' },
     { q: 'Is my investment secure?', a: 'Yes, we employ bank-grade 256-bit SSL encryption, cold wallet storage for funds, multi-factor authentication, and regular security audits to protect your assets.' },
     { q: 'How long does a withdrawal take?', a: 'Most withdrawals are processed instantly for small amounts. Larger withdrawals may take 24-48 hours for security verification. Cryptocurrency withdrawals are typically processed within 1 hour.' },
