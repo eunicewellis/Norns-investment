@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 declare global {
@@ -8,20 +8,6 @@ declare global {
 }
 
 const Home: React.FC = () => {
-  const [stats, setStats] = useState({ usersOnline: 0, totalInvested: 0, dailyProfit: 0, totalMembers: 0 });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStats({
-        usersOnline: Math.floor(Math.random() * 5000) + 10000,
-        totalInvested: Math.floor(Math.random() * 50000000) + 500000000,
-        dailyProfit: Math.floor(Math.random() * 100000) + 500000,
-        totalMembers: Math.floor(Math.random() * 10000) + 1248392
-      });
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   const openChat = () => {
     if (typeof window.smartsupp !== 'undefined') {
       window.smartsupp('chat:open');
@@ -38,26 +24,6 @@ const Home: React.FC = () => {
     { icon: 'fa-chart-simple', title: 'Real-Time Analytics', desc: 'Comprehensive dashboard with live profit tracking, portfolio insights, and market data.' },
     { icon: 'fa-bolt', title: 'Lightning Withdrawals', desc: 'Instant withdrawal processing with no minimum limits. Access your earnings anytime.' }
   ];
-
-  const [visibleFeed, setVisibleFeed] = useState([
-    { name: 'John D.', country: '🇺🇸', action: 'invested', amount: '$2,500', time: '2 min ago' },
-    { name: 'Amara O.', country: '🇳🇬', action: 'withdrew', amount: '$780', time: '5 min ago' },
-    { name: 'Luis M.', country: '🇧🇷', action: 'deposited', amount: '$5,000', time: '8 min ago' }
-  ]);
-
-  useEffect(() => {
-    const fi = setInterval(() => {
-      const v = (Math.floor(Math.random()*9000)+1000).toLocaleString();
-      setVisibleFeed(prev => [{
-        name: ['Alex M.', 'Jane D.', 'Mike R.'][Math.floor(Math.random()*3)],
-        country: ['🇺🇸', '🇳🇬', '🇧🇷'][Math.floor(Math.random()*3)],
-        action: ['invested', 'withdrew', 'deposited'][Math.floor(Math.random()*3)],
-        amount: '$' + v,
-        time: 'Just now'
-      }, ...prev].slice(0, 3));
-    }, 8000);
-    return () => clearInterval(fi);
-  }, []);
 
   return (
     <div>
@@ -79,59 +45,6 @@ const Home: React.FC = () => {
             <button onClick={openChat} className="btn btn-outline btn-lg">
               <i className="fas fa-comments"></i> Talk to Support
             </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== LIVE FEED ===== */}
-      <section className="live-feed">
-        <div className="live-card">
-          <div className="live-header">
-            <span className="live-dot"></span>
-            Live Activity
-          </div>
-          {visibleFeed.map((item, idx) => (
-            <div className="live-item" key={idx}>
-              <span>{item.country}</span>
-              <span className="live-name">{item.name}</span>
-              <span className="live-action">{item.action}</span>
-              <span className="live-amount">{item.amount}</span>
-              <span className="live-time">{item.time}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== STATS BAR ===== */}
-      <section className="section" style={{paddingTop:0}}>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon green"><i className="fas fa-users"></i></div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.usersOnline.toLocaleString()}</div>
-              <div className="stat-label">Investors Online</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon blue"><i className="fas fa-sack-dollar"></i></div>
-            <div className="stat-content">
-              <div className="stat-value">${stats.totalInvested.toLocaleString()}</div>
-              <div className="stat-label">Total Invested</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon amber"><i className="fas fa-coins"></i></div>
-            <div className="stat-content">
-              <div className="stat-value">${stats.dailyProfit.toLocaleString()}</div>
-              <div className="stat-label">Daily Mining Profits</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon purple"><i className="fas fa-globe"></i></div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.totalMembers.toLocaleString()}</div>
-              <div className="stat-label">Total Members</div>
-            </div>
           </div>
         </div>
       </section>
