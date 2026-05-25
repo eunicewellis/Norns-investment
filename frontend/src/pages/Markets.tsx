@@ -122,19 +122,19 @@ const Markets: React.FC = () => {
                     <span className="coin-symbol">{crypto.symbol}</span>
                   </div>
                 </td>
-                <td className={`price ${crypto.change >= 0 ? 'green' : 'red'}`}>
+                <td className={`price ${crypto.change >= 0 ? 'green' : 'red'}`} style={{verticalAlign:'middle'}}>
                   ${crypto.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </td>
-                <td>
-                  <span className={`change-badge ${crypto.change >= 0 ? 'up' : 'down'}`}>
+                <td style={{verticalAlign:'middle'}}>
+                  <span className={`change-badge ${crypto.change >= 0 ? 'up' : 'down'}`} style={{verticalAlign:'middle'}}>
                     {crypto.change >= 0 ? '▲' : '▼'} {Math.abs(crypto.change).toFixed(2)}%
                   </span>
                 </td>
-                <td className="price">${crypto.high.toLocaleString()}</td>
-                <td className="price">${crypto.low.toLocaleString()}</td>
-                <td>{crypto.volume}</td>
-                <td>{crypto.marketCap}</td>
-                <td>
+                <td className="price" style={{verticalAlign:'middle'}}>${crypto.high.toLocaleString()}</td>
+                <td className="price" style={{verticalAlign:'middle'}}>${crypto.low.toLocaleString()}</td>
+                <td style={{verticalAlign:'middle'}}>{crypto.volume}</td>
+                <td style={{verticalAlign:'middle'}}>{crypto.marketCap}</td>
+                <td style={{verticalAlign:'middle'}}>
                   <div className="mini-chart">
                     <svg width="80" height="30" viewBox="0 0 80 30">
                       <polyline
