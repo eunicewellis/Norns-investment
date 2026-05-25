@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import API_BASE_URL from '../config';
+import { getStoredCurrency, formatCurrency, countries, getCurrencyForCountry } from '../utils/currency';
 
 declare global {
   interface Window { smartsupp: any; }
@@ -18,6 +19,8 @@ const Dashboard: React.FC = () => {
   const [verifyDob, setVerifyDob] = useState('');
   const [verifyAddress, setVerifyAddress] = useState('');
   const [cryptoPrices, setCryptoPrices] = useState<any[]>([]);
+  const [currency, setCurrency] = useState(getStoredCurrency());
+  const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [stats, setStats] = useState({
     totalProfit: 0,
     totalInvested: 0,
@@ -44,22 +47,30 @@ const Dashboard: React.FC = () => {
     if (v === 'true') setIsVerified(true);
   };
 
+  const changeCurrency = (country: string) => {
+    const c = getCurrencyForCountry(country);
+    localStorage.setItem('binexelite_currency', JSON.stringify(c));
+    localStorage.setItem('binexelite_country', country);
+    setCurrency(c);
+    setShowCurrencyPicker(false);
+  };
+
+  const csym = () => currency.symbol;
+
   const fetchCryptoPrices = async () => {
     try {
       const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,cardano,ripple&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true');
       if (res.ok) {
         const data = await res.json();
         setCryptoPrices([
-          { name: 'Bitcoin', sym: 'BTC', icon: '₿', bg: '#f7931a', price: data.bitcoin.usd, change: data.bitcoin.usd_24h_change, volume: '$' + (data.bitcoin.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'Ethereum', sym: 'ETH', icon: '♦', bg: '#627eea', price: data.ethereum.usd, change: data.ethereum.usd_24h_change, volume: '$' + (data.ethereum.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'Solana', sym: 'SOL', icon: '◎', bg: '#00ffa3', price: data.solana.usd, change: data.solana.usd_24h_change, volume: '$' + (data.solana.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'Cardano', sym: 'ADA', icon: '₳', bg: '#0033ad', price: data.cardano.usd, change: data.cardano.usd_24h_change, volume: '$' + (data.cardano.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'XRP', sym: 'XRP', icon: '✕', bg: '#23292f', price: data.ripple.usd, change: data.ripple.usd_24h_change, volume: '$' + (data.ripple.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Bitcoin', sym: 'BTC', icon: '₿', bg: '#f7931a', price: data.bitcoin.usd, change: data.bitcoin.usd_24h_change, volume: csym() + (data.bitcoin.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Ethereum', sym: 'ETH', icon: '♦', bg: '#627eea', price: data.ethereum.usd, change: data.ethereum.usd_24h_change, volume: csym() + (data.ethereum.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Solana', sym: 'SOL', icon: '◎', bg: '#00ffa3', price: data.solana.usd, change: data.solana.usd_24h_change, volume: csym() + (data.solana.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Cardano', sym: 'ADA', icon: '₳', bg: '#0033ad', price: data.cardano.usd, change: data.cardano.usd_24h_change, volume: csym() + (data.cardano.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'XRP', sym: 'XRP', icon: '✕', bg: '#23292f', price: data.ripple.usd, change: data.ripple.usd_24h_change, volume: csym() + (data.ripple.usd_24h_vol / 1e9).toFixed(1) + 'B' },
         ]);
       }
-    } catch (e) {
-      // fallback
-    }
+    } catch (e) {}
   };
 
   const handleVerify = () => {
@@ -118,12 +129,31 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>Welcome back, {user.firstName}! <span role="img" aria-label="wave">👋</span></h1>
-        <p>Your investment dashboard — track your portfolio and earnings</p>
+      <div className="dashboard-header" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+        <div>
+          <h1>Welcome back, {user.firstName}! <span role="img" aria-label="wave">👋</span></h1>
+          <p>Your investment dashboard — track your portfolio and earnings</p>
+        </div>
+        <div style={{position:'relative'}}>
+          <button className="btn btn-ghost btn-sm" onClick={() => setShowCurrencyPicker(!showCurrencyPicker)}>
+            <i className="fas fa-money-bill-wave"></i> {currency.symbol} {currency.code}
+          </button>
+          {showCurrencyPicker && (
+            <div style={{position:'absolute', top:'100%', right:0, zIndex:100, maxHeight:'300px', overflowY:'auto', background:'var(--bg-card)', border:'1px solid var(--border-primary)', borderRadius:'var(--radius-md)', padding:'8px', minWidth:'200px'}}>
+              {countries.map(c => {
+                const cur = getCurrencyForCountry(c);
+                return (
+                  <button key={c} className={`mobile-link ${c === currency.code ? 'active' : ''}`}
+                    style={{width:'100%', textAlign:'left', padding:'8px 12px', fontSize:'0.85rem'}}
+                    onClick={() => changeCurrency(c)}
+                  >{cur.symbol} {cur.code} - {c}</button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Market Prices */}
       {cryptoPrices.length > 0 && (
       <div className="dashboard-card" style={{marginBottom:'28px'}}>
         <div className="dashboard-card-header">
@@ -140,7 +170,7 @@ const Dashboard: React.FC = () => {
                     <span className="coin-icon" style={{background:c.bg}}>{c.icon}</span>
                     <div><span className="coin-name">{c.name}</span><span className="coin-symbol">{c.sym}</span></div>
                   </td>
-                  <td className={`price ${c.change >= 0 ? 'green' : 'red'}`}>${c.price?.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                  <td className={`price ${c.change >= 0 ? 'green' : 'red'}`}>{csym()}{c.price?.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</td>
                   <td><span className={`change-badge ${c.change >= 0 ? 'up' : 'down'}`}>{c.change >= 0 ? '▲' : '▼'} {Math.abs(c.change || 0).toFixed(2)}%</span></td>
                   <td>{c.volume}</td>
                 </tr>
@@ -151,12 +181,11 @@ const Dashboard: React.FC = () => {
       </div>
       )}
 
-      {/* Quick Stats */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon green"><i className="fas fa-wallet"></i></div>
           <div className="stat-content">
-            <div className="stat-value">${user.balance.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{user.balance.toLocaleString()}</div>
             <div className="stat-label">Available Balance</div>
             <div className="stat-change up"><i className="fas fa-arrow-up"></i> Updated live</div>
           </div>
@@ -164,21 +193,21 @@ const Dashboard: React.FC = () => {
         <div className="stat-card">
           <div className="stat-icon blue"><i className="fas fa-chart-line"></i></div>
           <div className="stat-content">
-            <div className="stat-value">${stats.totalProfit.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{stats.totalProfit.toLocaleString()}</div>
             <div className="stat-label">Total Profit Earned</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon amber"><i className="fas fa-layer-group"></i></div>
           <div className="stat-content">
-            <div className="stat-value">${stats.totalInvested.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{stats.totalInvested.toLocaleString()}</div>
             <div className="stat-label">Active Investments</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon purple"><i className="fas fa-trophy"></i></div>
           <div className="stat-content">
-            <div className="stat-value">${stats.totalWithdrawn.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{stats.totalWithdrawn.toLocaleString()}</div>
             <div className="stat-label">Amount Withdrawn</div>
           </div>
         </div>
@@ -188,69 +217,42 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-quick-row" style={{display:'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '28px'}}>
         <div className="dashboard-card">
           <div className="dashboard-card-header">
-            <h3><i className="fas fa-bolt" style={{color:'var(--accent-primary)', marginRight:8}}></i>Quick Actions</h3>
+            <h3><i className="fas fa-bolt"></i>Quick Actions</h3>
           </div>
           <div className="quick-actions-grid">
-            <button className="quick-action-btn" onClick={() => navigate('/deposit')}>
-              <i className="fas fa-credit-card"></i> Make Deposit
-            </button>
-            <button className="quick-action-btn" onClick={() => navigate('/withdrawal')}>
-              <i className="fas fa-paper-plane"></i> Request Withdrawal
-            </button>
-            <button className="quick-action-btn" onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsuppchat.com', '_blank'); }}>
-              <i className="fas fa-rocket"></i> New Investment
-            </button>
-            <button className="quick-action-btn" onClick={() => navigate('/portfolio')}>
-              <i className="fas fa-chart-pie"></i> Portfolio
-            </button>
+            <button className="quick-action-btn" onClick={() => navigate('/deposit')}><i className="fas fa-credit-card"></i> Make Deposit</button>
+            <button className="quick-action-btn" onClick={() => navigate('/withdrawal')}><i className="fas fa-paper-plane"></i> Request Withdrawal</button>
+            <button className="quick-action-btn" onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsuppchat.com', '_blank'); }}><i className="fas fa-rocket"></i> New Investment</button>
+            <button className="quick-action-btn" onClick={() => navigate('/portfolio')}><i className="fas fa-chart-pie"></i> Portfolio</button>
           </div>
         </div>
-
         <div className="dashboard-card">
           <div className="dashboard-card-header">
-            <h3><i className="fas fa-briefcase" style={{color:'var(--accent-primary)', marginRight:8}}></i>Portfolio Overview</h3>
+            <h3><i className="fas fa-briefcase"></i>Portfolio Overview</h3>
           </div>
           <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
-            <div className="detail-row">
-              <span className="detail-label">Total Invested</span>
-              <span className="detail-value" style={{color:'var(--accent-primary)'}}>${stats.totalInvested.toLocaleString()}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Active ROI</span>
-              <span className="detail-value" style={{color:'var(--accent-secondary)'}}>12.5%</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Portfolio Performance</span>
-              <span className="detail-value" style={{color:'var(--accent-primary)'}}>+18.3% YTD</span>
-            </div>
+            <div className="detail-row"><span className="detail-label">Total Invested</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>{csym()}{stats.totalInvested.toLocaleString()}</span></div>
+            <div className="detail-row"><span className="detail-label">Active ROI</span><span className="detail-value" style={{color:'var(--accent-secondary)'}}>12.5%</span></div>
+            <div className="detail-row"><span className="detail-label">Portfolio Performance</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>+18.3% YTD</span></div>
             <div className="detail-row">
               <span className="detail-label">Account Status</span>
               {isVerified ? (
                 <span className="badge badge-primary"><i className="fas fa-check-circle"></i> Verified</span>
               ) : (
-                <button className="badge badge-warning" onClick={() => setShowVerification(true)} style={{cursor:'pointer', border:'none'}}>
-                  <i className="fas fa-clock"></i> Unverified
-                </button>
+                <button className="badge badge-warning" onClick={() => setShowVerification(true)} style={{cursor:'pointer', border:'none'}}><i className="fas fa-clock"></i> Unverified</button>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Verification Modal */}
       {showVerification && (
         <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000}} onClick={() => setShowVerification(false)}>
           <div className="card" style={{maxWidth:'440px', width:'90%', padding:'32px'}} onClick={e => e.stopPropagation()}>
             <h3 style={{fontWeight:700, marginBottom:'20px'}}>Verify Your Identity</h3>
             <p style={{color:'var(--text-secondary)', marginBottom:'24px', fontSize:'0.9rem'}}>Please enter your date of birth and address to verify your account.</p>
-            <div className="form-group">
-              <label className="form-label">Date of Birth</label>
-              <input type="date" className="form-input" value={verifyDob} onChange={e => setVerifyDob(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Address</label>
-              <textarea className="form-textarea" value={verifyAddress} onChange={e => setVerifyAddress(e.target.value)} placeholder="Enter your full address" rows={3}></textarea>
-            </div>
+            <div className="form-group"><label className="form-label">Date of Birth</label><input type="date" className="form-input" value={verifyDob} onChange={e => setVerifyDob(e.target.value)} /></div>
+            <div className="form-group"><label className="form-label">Address</label><textarea className="form-textarea" value={verifyAddress} onChange={e => setVerifyAddress(e.target.value)} placeholder="Enter your full address" rows={3}></textarea></div>
             <div style={{display:'flex', gap:'12px'}}>
               <button className="btn btn-primary btn-full" onClick={handleVerify} disabled={!verifyDob || !verifyAddress}>Submit & Verify</button>
               <button className="btn btn-ghost" onClick={() => setShowVerification(false)}>Cancel</button>
@@ -259,10 +261,9 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Performance Chart */}
       <div className="dashboard-card" style={{marginBottom:'28px'}}>
         <div className="dashboard-card-header">
-          <h3><i className="fas fa-chart-area" style={{color:'var(--accent-primary)', marginRight:8}}></i>Monthly Performance</h3>
+          <h3><i className="fas fa-chart-area"></i>Monthly Performance</h3>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={sampleChartData}>
@@ -275,10 +276,9 @@ const Dashboard: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Active Investments */}
       <div className="dashboard-card" style={{marginBottom:'28px'}}>
         <div className="dashboard-card-header">
-          <h3><i className="fas fa-layer-group" style={{color:'var(--accent-primary)', marginRight:8}}></i>Active Investments</h3>
+          <h3><i className="fas fa-layer-group"></i>Active Investments</h3>
           <Link to="/portfolio" style={{fontSize:'0.85rem',color:'var(--accent-primary)',fontWeight:600}}>View All <i className="fas fa-arrow-right"></i></Link>
         </div>
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:'16px'}}>
@@ -289,18 +289,9 @@ const Dashboard: React.FC = () => {
                 <span className="tx-status active"><i className="fas fa-circle"></i> Active</span>
               </div>
               <div className="investment-details">
-                <div className="detail-row">
-                  <span className="detail-label">Investment</span>
-                  <span className="detail-value">${investment.amount.toLocaleString()}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">ROI</span>
-                  <span className="detail-value" style={{color:'var(--accent-primary)'}}>{investment.roiPercentage}%</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Maturity</span>
-                  <span className="detail-value">{new Date(investment.maturityDate).toLocaleDateString()}</span>
-                </div>
+                <div className="detail-row"><span className="detail-label">Investment</span><span className="detail-value">{csym()}{investment.amount.toLocaleString()}</span></div>
+                <div className="detail-row"><span className="detail-label">ROI</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>{investment.roiPercentage}%</span></div>
+                <div className="detail-row"><span className="detail-label">Maturity</span><span className="detail-value">{new Date(investment.maturityDate).toLocaleDateString()}</span></div>
               </div>
               <div className="progress-section">
                 <div className="progress-bar"><div className="progress-fill" style={{width:'75%'}}></div></div>
@@ -318,10 +309,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Live Recent Activity */}
       <div className="dashboard-card">
         <div className="dashboard-card-header">
-          <h3><i className="fas fa-clock-rotate" style={{color:'var(--accent-primary)', marginRight:8}}></i>Live Activity</h3>
+          <h3><i className="fas fa-clock-rotate"></i>Live Activity</h3>
         </div>
         <div>
           {recentActivity.length > 0 ? recentActivity.map((act, i) => (
