@@ -109,7 +109,7 @@ const Markets: React.FC = () => {
               <i className="fas fa-money-bill-wave"></i> {currency.symbol} {currency.code}
             </button>
             {showCurrencyPicker && (
-              <div style={{position:'absolute', top:'100%', right:0, zIndex:100, maxHeight:'300px', overflowY:'auto', background:'var(--bg-card)', border:'1px solid var(--border-primary)', borderRadius:'var(--radius-md)', padding:'8px', minWidth:'200px'}}>
+              <div style={{position:'absolute', top:'100%', left:'50%', transform:'translateX(-50%)', zIndex:100, maxHeight:'300px', overflowY:'auto', background:'var(--bg-card)', border:'1px solid var(--border-primary)', borderRadius:'var(--radius-md)', padding:'8px', minWidth:'200px'}}>
                 {countries.map(c => {
                   const cur = getCurrencyForCountry(c);
                   return (

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const About: React.FC = () => {
   const stats = [
     { value: '2020', label: 'Founded' },
-    { value: '50K+', label: 'Investors' },
+    { value: '2.4M+', label: 'Investors' },
     { value: '120+', label: 'Countries' },
     { value: '$8.5M+', label: 'Profits Paid' },
   ];
