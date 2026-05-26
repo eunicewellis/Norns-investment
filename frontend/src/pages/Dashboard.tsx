@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import API_BASE_URL from '../config';
-import { getStoredCurrency, formatCurrency, countries, getCurrencyForCountry } from '../utils/currency';
+import { getStoredCurrency, countries, getCurrencyForCountry } from '../utils/currency';
 
 declare global {
   interface Window { smartsupp: any; }

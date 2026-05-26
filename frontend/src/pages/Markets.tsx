@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchExchangeRates, convertPrice, getStoredCurrency } from '../utils/currency';
 
 interface CryptoCoin {
   name: string;
@@ -28,10 +29,11 @@ const Markets: React.FC = () => {
   const [cryptos, setCryptos] = useState<CryptoCoin[]>([]);
   const [animatePrices, setAnimatePrices] = useState(false);
   const [loading, setLoading] = useState(true);
+  const currency = getStoredCurrency();
 
   useEffect(() => {
-    fetchPrices();
-    const interval = setInterval(fetchPrices, 30000);
+    fetchExchangeRates().then(() => fetchPrices());
+    const interval = setInterval(() => fetchExchangeRates().then(() => fetchPrices()), 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -46,10 +48,10 @@ const Markets: React.FC = () => {
           return {
             name: id === 'ripple' ? 'XRP' : id === 'avalanche-2' ? 'Avalanche' : id.charAt(0).toUpperCase() + id.slice(1),
             symbol: meta.symbol,
-            price: coin.usd || 0,
+            price: convertPrice(coin.usd || 0, currency.code),
             change: coin.usd_24h_change || 0,
-            high: coin.usd_24h_high || 0,
-            low: coin.usd_24h_low || 0,
+            high: convertPrice(coin.usd_24h_high || 0, currency.code),
+            low: convertPrice(coin.usd_24h_low || 0, currency.code),
             volume: coin.usd_24h_vol ? '$' + (coin.usd_24h_vol / 1e9).toFixed(1) + 'B' : 'N/A',
             marketCap: coin.usd_market_cap ? '$' + (coin.usd_market_cap / 1e12).toFixed(2) + 'T' : 'N/A',
             icon: meta.icon,
@@ -160,16 +162,16 @@ const Markets: React.FC = () => {
                     <span className="coin-symbol">{crypto.symbol}</span>
                   </div>
                 </td>
-                <td className={`price ${crypto.change >= 0 ? 'green' : 'red'}`}>
-                  ${crypto.price?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                <td className={`price ${crypto.change >= 0 ? 'green' : 'red'}`} style={{verticalAlign:'middle'}}>
+                  {currency.symbol}{crypto.price?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </td>
                 <td>
                   <span className={`change-badge ${crypto.change >= 0 ? 'up' : 'down'}`}>
                     {crypto.change >= 0 ? '▲' : '▼'} {Math.abs(crypto.change || 0).toFixed(2)}%
                   </span>
                 </td>
-                <td className="price green">${crypto.high?.toLocaleString()}</td>
-                <td className="price red">${crypto.low?.toLocaleString()}</td>
+                <td className="price green" style={{verticalAlign:'middle'}}>{currency.symbol}{crypto.high?.toLocaleString()}</td>
+                <td className="price red" style={{verticalAlign:'middle'}}>{currency.symbol}{crypto.low?.toLocaleString()}</td>
                 <td>{crypto.volume}</td>
                 <td>{crypto.marketCap}</td>
                 <td>

@@ -5,10 +5,6 @@ export interface CurrencyInfo {
 }
 
 export const countryCurrencyMap: Record<string, CurrencyInfo> = {
-  'Nigeria': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' },
-  'Ghana': { code: 'GHS', symbol: '₵', name: 'Ghanaian Cedi' },
-  'Kenya': { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling' },
-  'South Africa': { code: 'ZAR', symbol: 'R', name: 'South African Rand' },
   'United States': { code: 'USD', symbol: '$', name: 'US Dollar' },
   'United Kingdom': { code: 'GBP', symbol: '£', name: 'British Pound' },
   'Canada': { code: 'CAD', symbol: 'CA$', name: 'Canadian Dollar' },
@@ -47,6 +43,30 @@ export const countries = Object.keys(countryCurrencyMap);
 
 export const defaultCurrency: CurrencyInfo = { code: 'USD', symbol: '$', name: 'US Dollar' };
 
+let cachedRates: Record<string, number> = {};
+let lastFetched = 0;
+
+export async function fetchExchangeRates(): Promise<Record<string, number>> {
+  const now = Date.now();
+  if (Object.keys(cachedRates).length > 0 && now - lastFetched < 600000) {
+    return cachedRates;
+  }
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    if (res.ok) {
+      const data = await res.json();
+      cachedRates = data.rates || {};
+      lastFetched = now;
+    }
+  } catch (e) {}
+  return cachedRates;
+}
+
+export function convertPrice(usdPrice: number, targetCode: string): number {
+  if (targetCode === 'USD' || !cachedRates[targetCode]) return usdPrice;
+  return usdPrice * cachedRates[targetCode];
+}
+
 export function getCurrencyForCountry(country: string): CurrencyInfo {
   return countryCurrencyMap[country] || defaultCurrency;
 }
@@ -63,9 +83,4 @@ export function getStoredCurrency(): CurrencyInfo {
     return getCurrencyForCountry(storedCountry);
   }
   return defaultCurrency;
-}
-
-export function formatCurrency(amount: number, currency?: CurrencyInfo): string {
-  const c = currency || getStoredCurrency();
-  return c.symbol + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
