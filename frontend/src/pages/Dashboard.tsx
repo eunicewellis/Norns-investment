@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import API_BASE_URL from '../config';
-import { getStoredCurrency, countries, getCurrencyForCountry } from '../utils/currency';
+import { getStoredCurrency, countries, getCurrencyForCountry, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 declare global {
   interface Window { smartsupp: any; }
@@ -59,16 +59,18 @@ const Dashboard: React.FC = () => {
 
   const fetchCryptoPrices = async () => {
     try {
+      await fetchExchangeRates();
       const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,cardano,ripple&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true');
       if (res.ok) {
         const data = await res.json();
-        setCryptoPrices([
-          { name: 'Bitcoin', sym: 'BTC', icon: '₿', bg: '#f7931a', price: data.bitcoin.usd, change: data.bitcoin.usd_24h_change, volume: csym() + (data.bitcoin.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'Ethereum', sym: 'ETH', icon: '♦', bg: '#627eea', price: data.ethereum.usd, change: data.ethereum.usd_24h_change, volume: csym() + (data.ethereum.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'Solana', sym: 'SOL', icon: '◎', bg: '#00ffa3', price: data.solana.usd, change: data.solana.usd_24h_change, volume: csym() + (data.solana.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'Cardano', sym: 'ADA', icon: '₳', bg: '#0033ad', price: data.cardano.usd, change: data.cardano.usd_24h_change, volume: csym() + (data.cardano.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-          { name: 'XRP', sym: 'XRP', icon: '✕', bg: '#23292f', price: data.ripple.usd, change: data.ripple.usd_24h_change, volume: csym() + (data.ripple.usd_24h_vol / 1e9).toFixed(1) + 'B' },
-        ]);
+        const prices = [
+          { name: 'Bitcoin', sym: 'BTC', icon: '₿', bg: '#f7931a', price: convertPrice(data.bitcoin.usd, currency.code), change: Math.abs(data.bitcoin.usd_24h_change || 0), volume: csym() + (data.bitcoin.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Ethereum', sym: 'ETH', icon: '♦', bg: '#627eea', price: convertPrice(data.ethereum.usd, currency.code), change: data.ethereum.usd_24h_change || 0, volume: csym() + (data.ethereum.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Solana', sym: 'SOL', icon: '◎', bg: '#00ffa3', price: convertPrice(data.solana.usd, currency.code), change: data.solana.usd_24h_change || 0, volume: csym() + (data.solana.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'Cardano', sym: 'ADA', icon: '₳', bg: '#0033ad', price: convertPrice(data.cardano.usd, currency.code), change: data.cardano.usd_24h_change || 0, volume: csym() + (data.cardano.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+          { name: 'XRP', sym: 'XRP', icon: '✕', bg: '#23292f', price: convertPrice(data.ripple.usd, currency.code), change: data.ripple.usd_24h_change || 0, volume: csym() + (data.ripple.usd_24h_vol / 1e9).toFixed(1) + 'B' },
+        ];
+        setCryptoPrices(prices);
       }
     } catch (e) {}
   };

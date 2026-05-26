@@ -34,7 +34,7 @@ const Home: React.FC = () => {
         <div className="hero-content">
           <div className="hero-badge">
             <i className="fas fa-users"></i>
-            Trusted by 50K+ Investors Worldwide
+            Trusted by 2.4M+ Investors Worldwide
           </div>
           <h1>Invest in <span>Cryptocurrency Mining</span><br />& Earn Daily Profits</h1>
           <p>Advanced cryptocurrency mining and investment platform built to optimize digital asset generation through intelligent hash-power allocation, automated mining strategies, and real-time Bitcoin market analytics.</p>
@@ -71,7 +71,7 @@ const Home: React.FC = () => {
       <div className="section" style={{paddingBottom:0}}>
         <section className="cta-section">
           <h2>Start Earning Bitcoin Today</h2>
-          <p>Join over 50,000 investors already earning daily profits through our crypto mining platform. No experience required.</p>
+          <p>Join over 2.4 million investors already earning daily profits through our crypto mining platform. No experience required.</p>
           <button onClick={openChat} className="btn btn-primary btn-lg">
             <i className="fas fa-comments"></i> Talk to Our Team
           </button>

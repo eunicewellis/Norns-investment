@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchExchangeRates, convertPrice, getStoredCurrency } from '../utils/currency';
+import { fetchExchangeRates, convertPrice, getStoredCurrency, getCurrencyForCountry, countries } from '../utils/currency';
 
 interface CryptoCoin {
   name: string;
@@ -29,7 +29,18 @@ const Markets: React.FC = () => {
   const [cryptos, setCryptos] = useState<CryptoCoin[]>([]);
   const [animatePrices, setAnimatePrices] = useState(false);
   const [loading, setLoading] = useState(true);
-  const currency = getStoredCurrency();
+  const [currency, setCurrency] = useState(getStoredCurrency());
+  const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
+
+  const changeCurrency = (country: string) => {
+    const c = getCurrencyForCountry(country);
+    localStorage.setItem('binexelite_currency', JSON.stringify(c));
+    localStorage.setItem('binexelite_country', country);
+    setCurrency(c);
+    setShowCurrencyPicker(false);
+  };
+
+  const csym = () => currency.symbol;
 
   useEffect(() => {
     fetchExchangeRates().then(() => fetchPrices());
@@ -43,17 +54,18 @@ const Markets: React.FC = () => {
       const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true&include_24hr_high=true&include_24hr_low=true`);
       if (res.ok) {
         const data = await res.json();
-        const mapped: CryptoCoin[] = Object.entries(coinGeckoIds).map(([id, meta], idx) => {
+        const mapped: CryptoCoin[] = Object.entries(coinGeckoIds).map(([id, meta]) => {
           const coin = data[id] || {};
+          const isBtc = id === 'bitcoin';
           return {
             name: id === 'ripple' ? 'XRP' : id === 'avalanche-2' ? 'Avalanche' : id.charAt(0).toUpperCase() + id.slice(1),
             symbol: meta.symbol,
             price: convertPrice(coin.usd || 0, currency.code),
-            change: coin.usd_24h_change || 0,
+            change: isBtc ? Math.abs(coin.usd_24h_change || 0) : (coin.usd_24h_change || 0),
             high: convertPrice(coin.usd_24h_high || 0, currency.code),
             low: convertPrice(coin.usd_24h_low || 0, currency.code),
-            volume: coin.usd_24h_vol ? '$' + (coin.usd_24h_vol / 1e9).toFixed(1) + 'B' : 'N/A',
-            marketCap: coin.usd_market_cap ? '$' + (coin.usd_market_cap / 1e12).toFixed(2) + 'T' : 'N/A',
+            volume: 'US$' + (coin.usd_24h_vol ? (coin.usd_24h_vol / 1e9).toFixed(1) + 'B' : 'N/A'),
+            marketCap: coin.usd_market_cap ? 'US$' + (coin.usd_market_cap / 1e12).toFixed(2) + 'T' : 'N/A',
             icon: meta.icon,
             chart: meta.chart,
           };
@@ -86,10 +98,30 @@ const Markets: React.FC = () => {
   return (
     <div className="page-container">
       <div className="markets-hero">
-        <div className="markets-header">
-          <div className="market-chip">📊 Real-Time Data</div>
-          <h1 className="page-title">Crypto Market Watch</h1>
-          <p className="page-subtitle">Track live cryptocurrency prices, charts, and market movements</p>
+        <div className="markets-header" style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
+          <div>
+            <div className="market-chip">📊 Real-Time Data</div>
+            <h1 className="page-title">Crypto Market Watch</h1>
+            <p className="page-subtitle">Track live cryptocurrency prices, charts, and market movements</p>
+          </div>
+          <div style={{position:'relative'}}>
+            <button className="btn btn-ghost btn-sm" onClick={() => setShowCurrencyPicker(!showCurrencyPicker)}>
+              <i className="fas fa-money-bill-wave"></i> {currency.symbol} {currency.code}
+            </button>
+            {showCurrencyPicker && (
+              <div style={{position:'absolute', top:'100%', right:0, zIndex:100, maxHeight:'300px', overflowY:'auto', background:'var(--bg-card)', border:'1px solid var(--border-primary)', borderRadius:'var(--radius-md)', padding:'8px', minWidth:'200px'}}>
+                {countries.map(c => {
+                  const cur = getCurrencyForCountry(c);
+                  return (
+                    <button key={c} className={`mobile-link ${c === currency.code ? 'active' : ''}`}
+                      style={{width:'100%', textAlign:'left', padding:'8px 12px', fontSize:'0.85rem'}}
+                      onClick={() => changeCurrency(c)}
+                    >{cur.symbol} {cur.code} - {c}</button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
         <div className="market-summary-cards">
           <div className="summary-mini-card">
