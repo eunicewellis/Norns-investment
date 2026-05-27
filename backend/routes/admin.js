@@ -110,7 +110,7 @@ router.get('/users', auth, async (req, res) => {
 router.put('/users/:id/finance', auth, async (req, res) => {
   try {
     const { balance, totalProfit, totalDeposited, totalWithdrawn } = req.body;
-    const updateData: any = {};
+    const updateData = {};
     if (balance !== undefined && !isNaN(balance)) updateData.balance = balance;
     if (totalProfit !== undefined && !isNaN(totalProfit)) updateData.totalProfit = totalProfit;
     if (totalDeposited !== undefined && !isNaN(totalDeposited)) updateData.totalDeposited = totalDeposited;
