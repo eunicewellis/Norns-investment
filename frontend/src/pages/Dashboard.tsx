@@ -23,7 +23,8 @@ const Dashboard: React.FC = () => {
     totalInvested: 0,
     totalWithdrawn: 0,
     activeCount: 0,
-    completedCount: 0
+    completedCount: 0,
+    balance: 0
   });
   const navigate = useNavigate();
 
@@ -59,6 +60,9 @@ const Dashboard: React.FC = () => {
   };
 
   const csym = () => currency.symbol;
+
+  // Convert USD amount to selected currency using exchange rates
+  const cval = (usdAmt: number) => convertPrice(usdAmt, currency.code);
 
   const checkKycStatus = async () => {
     try {
@@ -117,7 +121,8 @@ const Dashboard: React.FC = () => {
         totalInvested: Number(totalInvested.toFixed(2)),
         totalWithdrawn: data.totalWithdrawn || 0,
         activeCount: data.activeInvestments.length,
-        completedCount: data.completedInvestments.length
+        completedCount: data.completedInvestments.length,
+        balance: data.balance || 0
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -196,7 +201,7 @@ const Dashboard: React.FC = () => {
         <div className="stat-card">
           <div className="stat-icon green"><i className="fas fa-wallet"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{csym()}{user.balance.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{cval(user.balance).toLocaleString()}</div>
             <div className="stat-label">Available Balance</div>
             <div className="stat-change up"><i className="fas fa-arrow-up"></i> Updated live</div>
           </div>
@@ -204,21 +209,21 @@ const Dashboard: React.FC = () => {
         <div className="stat-card">
           <div className="stat-icon blue"><i className="fas fa-chart-line"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{csym()}{stats.totalProfit.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{cval(stats.totalProfit).toLocaleString()}</div>
             <div className="stat-label">Total Profit Earned</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon amber"><i className="fas fa-layer-group"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{csym()}{stats.totalInvested.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{cval(stats.totalInvested).toLocaleString()}</div>
             <div className="stat-label">Active Investments</div>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon purple"><i className="fas fa-trophy"></i></div>
           <div className="stat-content">
-            <div className="stat-value">{csym()}{stats.totalWithdrawn.toLocaleString()}</div>
+            <div className="stat-value">{csym()}{cval(stats.totalWithdrawn).toLocaleString()}</div>
             <div className="stat-label">Amount Withdrawn</div>
           </div>
         </div>
@@ -242,7 +247,7 @@ const Dashboard: React.FC = () => {
             <h3><i className="fas fa-briefcase"></i>Portfolio Overview</h3>
           </div>
           <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
-            <div className="detail-row"><span className="detail-label">Total Invested</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>{csym()}{stats.totalInvested.toLocaleString()}</span></div>
+            <div className="detail-row"><span className="detail-label">Total Invested</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>{csym()}{cval(stats.totalInvested).toLocaleString()}</span></div>
             <div className="detail-row"><span className="detail-label">Active ROI</span><span className="detail-value" style={{color:'var(--accent-secondary)'}}>12.5%</span></div>
             <div className="detail-row"><span className="detail-label">Portfolio Performance</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>+18.3% YTD</span></div>
             <div className="detail-row">
@@ -285,7 +290,7 @@ const Dashboard: React.FC = () => {
                 <span className="tx-status active"><i className="fas fa-circle"></i> Active</span>
               </div>
               <div className="investment-details">
-                <div className="detail-row"><span className="detail-label">Investment</span><span className="detail-value">{csym()}{investment.amount.toLocaleString()}</span></div>
+                <div className="detail-row"><span className="detail-label">Investment</span><span className="detail-value">{csym()}{cval(investment.amount).toLocaleString()}</span></div>
                 <div className="detail-row"><span className="detail-label">ROI</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>{investment.roiPercentage}%</span></div>
                 <div className="detail-row"><span className="detail-label">Maturity</span><span className="detail-value">{new Date(investment.maturityDate).toLocaleDateString()}</span></div>
               </div>
