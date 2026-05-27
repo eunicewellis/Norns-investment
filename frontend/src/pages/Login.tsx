@@ -24,9 +24,10 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Clear any existing admin token to avoid conflicts
+        localStorage.removeItem('admin_authenticated');
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        // Restore currency from user profile country
         if (data.user?.country) {
           localStorage.setItem('binexelite_country', data.user.country);
         }

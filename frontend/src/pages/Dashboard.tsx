@@ -36,6 +36,16 @@ const Dashboard: React.FC = () => {
       navigate('/login');
       return;
     }
+    // Detect admin-only token and redirect
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.admin && !payload.userId) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('admin_authenticated');
+        navigate('/login');
+        return;
+      }
+    } catch (e) {}
     fetchUserData();
     fetchCryptoPrices();
     checkVerification();
@@ -95,6 +105,7 @@ const Dashboard: React.FC = () => {
       });
       if (response.status === 401) {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         navigate('/login');
         return;
       }

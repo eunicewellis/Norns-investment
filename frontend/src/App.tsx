@@ -31,6 +31,13 @@ import ScrollToTop from './components/ScrollToTop';
 function HomeOrRedirect() {
   const token = localStorage.getItem('token');
   if (token) {
+    // Don't redirect to dashboard if this is an admin-only token (no userId)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.admin && !payload.userId) {
+        return <Home />;
+      }
+    } catch (e) {}
     return <Navigate to="/dashboard" replace />;
   }
   return <Home />;
