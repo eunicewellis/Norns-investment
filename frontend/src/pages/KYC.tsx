@@ -51,22 +51,21 @@ const KYC: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const formPayload = new FormData();
-      
-      Object.entries(formData).forEach(([key, value]) => {
-        formPayload.append(key, value);
-      });
-
       const response = await fetch(`${API_BASE_URL}/kyc/submit`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formPayload,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess('Personal information submitted successfully! We will review it shortly.');
-        setKycStatus('pending');
+        setSuccess('Identity verified successfully! Redirecting...');
+        setKycStatus('verified');
+        // Redirect to dashboard after a short delay
+        setTimeout(() => navigate('/dashboard'), 2000);
       } else {
         setError(data.message || 'Submission failed. Please try again.');
       }

@@ -104,13 +104,16 @@ router.post('/submit', auth, async (req, res) => {
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
 
-    // Create a KYC document entry to track the pending verification
+    // Clear any existing KYC documents
+    user.kycDocuments = [];
+
+    // Create a KYC document entry
     const kycDocument = new KycDocument({
       userId: user._id,
       documentType: 'KYCInfo',
       fileName: 'personal-info',
       filePath: '',
-      status: 'pending',
+      status: 'approved',
       metadata: {
         firstName,
         lastName,
@@ -120,12 +123,14 @@ router.post('/submit', auth, async (req, res) => {
     });
     await kycDocument.save();
     user.kycDocuments.push(kycDocument._id);
+    user.kycVerified = true;
 
     await user.save();
 
     res.json({
-      message: 'KYC information submitted successfully! We will review it shortly.',
-      status: 'pending'
+      message: 'KYC information submitted successfully! Your identity has been verified.',
+      status: 'verified',
+      kycVerified: true
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

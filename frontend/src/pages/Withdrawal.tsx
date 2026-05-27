@@ -103,8 +103,8 @@ const Withdrawal: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(`Withdrawal request for $${parseFloat(amount).toLocaleString()} submitted successfully!`);
-        setTimeout(() => { window.location.href = '/dashboard'; }, 3000);
+        setSuccess(`Withdrawal request for $${parseFloat(amount).toLocaleString()} has been processed successfully!`);
+        setTimeout(() => { navigate('/dashboard'); }, 3000);
       } else {
         setError(data.message);
       }

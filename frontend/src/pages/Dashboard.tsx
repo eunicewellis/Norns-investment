@@ -14,10 +14,7 @@ const Dashboard: React.FC = () => {
   const [activeInvestments, setActiveInvestments] = useState([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [, setCompletedInvestments] = useState([]);
-  const [isVerified, setIsVerified] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
-  const [verifyDob, setVerifyDob] = useState('');
-  const [verifyAddress, setVerifyAddress] = useState('');
+  const [kycVerified, setKycVerified] = useState(false);
   const [cryptoPrices, setCryptoPrices] = useState<any[]>([]);
   const [currency, setCurrency] = useState(getStoredCurrency());
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
@@ -48,7 +45,7 @@ const Dashboard: React.FC = () => {
     } catch (e) {}
     fetchUserData();
     fetchCryptoPrices();
-    checkVerification();
+    checkKycStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
@@ -63,9 +60,19 @@ const Dashboard: React.FC = () => {
 
   const csym = () => currency.symbol;
 
-  const checkVerification = () => {
-    const v = localStorage.getItem('binexelite_verified');
-    if (v === 'true') setIsVerified(true);
+  const checkKycStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/kyc/status`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setKycVerified(data.kycVerified === true);
+      }
+    } catch (e) {
+      console.error('Error checking KYC status:', e);
+    }
   };
 
   const fetchCryptoPrices = async (curCode?: string, curSym?: string) => {
@@ -86,16 +93,6 @@ const Dashboard: React.FC = () => {
         setCryptoPrices(prices);
       }
     } catch (e) {}
-  };
-
-  const handleVerify = () => {
-    if (verifyDob && verifyAddress) {
-      localStorage.setItem('binexelite_verified', 'true');
-      localStorage.setItem('binexelite_dob', verifyDob);
-      localStorage.setItem('binexelite_address', verifyAddress);
-      setIsVerified(true);
-      setShowVerification(false);
-    }
   };
 
   const fetchUserData = async () => {
@@ -250,30 +247,15 @@ const Dashboard: React.FC = () => {
             <div className="detail-row"><span className="detail-label">Portfolio Performance</span><span className="detail-value" style={{color:'var(--accent-primary)'}}>+18.3% YTD</span></div>
             <div className="detail-row">
               <span className="detail-label">Account Status</span>
-              {isVerified ? (
+              {kycVerified ? (
                 <span className="badge badge-primary"><i className="fas fa-check-circle"></i> Verified</span>
               ) : (
-                <button className="badge badge-warning" onClick={() => setShowVerification(true)} style={{cursor:'pointer', border:'none'}}><i className="fas fa-clock"></i> Unverified</button>
+                <Link to="/kyc" className="badge badge-warning" style={{cursor:'pointer', textDecoration:'none'}}><i className="fas fa-clock"></i> Unverified</Link>
               )}
             </div>
           </div>
         </div>
       </div>
-
-      {showVerification && (
-        <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000}} onClick={() => setShowVerification(false)}>
-          <div className="card" style={{maxWidth:'440px', width:'90%', padding:'32px'}} onClick={e => e.stopPropagation()}>
-            <h3 style={{fontWeight:700, marginBottom:'20px'}}>Verify Your Identity</h3>
-            <p style={{color:'var(--text-secondary)', marginBottom:'24px', fontSize:'0.9rem'}}>Please enter your date of birth and address to verify your account.</p>
-            <div className="form-group"><label className="form-label">Date of Birth</label><input type="date" className="form-input" value={verifyDob} onChange={e => setVerifyDob(e.target.value)} /></div>
-            <div className="form-group"><label className="form-label">Address</label><textarea className="form-textarea" value={verifyAddress} onChange={e => setVerifyAddress(e.target.value)} placeholder="Enter your full address" rows={3}></textarea></div>
-            <div style={{display:'flex', gap:'12px'}}>
-              <button className="btn btn-primary btn-full" onClick={handleVerify} disabled={!verifyDob || !verifyAddress}>Submit & Verify</button>
-              <button className="btn btn-ghost" onClick={() => setShowVerification(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="dashboard-card" style={{marginBottom:'28px'}}>
         <div className="dashboard-card-header">

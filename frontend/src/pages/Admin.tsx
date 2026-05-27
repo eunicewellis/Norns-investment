@@ -336,10 +336,10 @@ const Admin: React.FC = () => {
                 <label className="form-label">Total Profit Earned ({adminCurr})</label>
                 <input type="number" className="form-input" value={userTotalProfit} onChange={e => setUserTotalProfit(Number(e.target.value))} />
               </div>
-              <div className="form-group">
-                <label className="form-label">Total Deposited ({adminCurr})</label>
-                <input type="number" className="form-input" value={userTotalDeposited} onChange={e => setUserTotalDeposited(Number(e.target.value))} />
-              </div>
+                <div className="form-group">
+                  <label className="form-label">Amount Invested ({adminCurr})</label>
+                  <input type="number" className="form-input" value={userTotalDeposited} onChange={e => setUserTotalDeposited(Number(e.target.value))} />
+                </div>
               <div className="form-group">
                 <label className="form-label">Total Withdrawn ({adminCurr})</label>
                 <input type="number" className="form-input" value={userTotalWithdrawn} onChange={e => setUserTotalWithdrawn(Number(e.target.value))} />
