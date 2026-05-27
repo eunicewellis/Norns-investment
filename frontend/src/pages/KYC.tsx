@@ -1,40 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
 
 const KYC: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(1);
   const [kycStatus, setKycStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     dateOfBirth: '',
     nationality: '',
-    address: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: '',
-    phoneNumber: '',
-  });
-
-  const [documents, setDocuments] = useState<{
-    idFront: File | null;
-    idBack: File | null;
-    selfie: File | null;
-    proofOfAddress: File | null;
-  }>({
-    idFront: null,
-    idBack: null,
-    selfie: null,
-    proofOfAddress: null,
   });
 
   useEffect(() => {
@@ -65,12 +45,6 @@ const KYC: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (field: keyof typeof documents) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setDocuments({ ...documents, [field]: e.target.files[0] });
-    }
-  };
-
   const handleSubmitKyc = async () => {
     setIsSubmitting(true);
     setError('');
@@ -83,11 +57,6 @@ const KYC: React.FC = () => {
         formPayload.append(key, value);
       });
 
-      if (documents.idFront) formPayload.append('idFront', documents.idFront);
-      if (documents.idBack) formPayload.append('idBack', documents.idBack);
-      if (documents.selfie) formPayload.append('selfie', documents.selfie);
-      if (documents.proofOfAddress) formPayload.append('proofOfAddress', documents.proofOfAddress);
-
       const response = await fetch(`${API_BASE_URL}/kyc/submit`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -96,7 +65,7 @@ const KYC: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess('KYC documents submitted successfully! We will review them shortly.');
+        setSuccess('Personal information submitted successfully! We will review it shortly.');
         setKycStatus('pending');
       } else {
         setError(data.message || 'Submission failed. Please try again.');
@@ -108,46 +77,12 @@ const KYC: React.FC = () => {
     }
   };
 
-  const stepFields = [
+  const personalFields = [
     { label: 'First Name', name: 'firstName', type: 'text' as const, placeholder: 'Enter your first name' },
     { label: 'Last Name', name: 'lastName', type: 'text' as const, placeholder: 'Enter your last name' },
-    { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' as const },
+    { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' as const, placeholder: '' },
     { label: 'Nationality', name: 'nationality', type: 'text' as const, placeholder: 'e.g. American' },
   ];
-
-  const addressFields = [
-    { label: 'Street Address', name: 'address', type: 'text' as const, placeholder: 'Enter your street address' },
-    { label: 'City', name: 'city', type: 'text' as const, placeholder: 'Enter your city' },
-    { label: 'State/Province', name: 'state', type: 'text' as const, placeholder: 'Enter your state' },
-    { label: 'Postal Code', name: 'postalCode', type: 'text' as const, placeholder: 'e.g. 10001' },
-    { label: 'Country', name: 'country', type: 'text' as const, placeholder: 'e.g. United States' },
-    { label: 'Phone Number', name: 'phoneNumber', type: 'tel' as const, placeholder: '+1 (555) 123-4567' },
-  ];
-
-  const renderDocumentUpload = (field: keyof typeof documents, label: string, desc: string) => {
-    const file = documents[field];
-    return (
-      <div className="kyc-doc-upload" onClick={() => fileInputRef.current?.click()}>
-        <div className="kyc-upload-icon">
-          {file ? '✅' : '📄'}
-        </div>
-        <div className="kyc-upload-text">
-          <strong>{label}</strong>
-          <p>{desc}</p>
-        </div>
-        {file && (
-          <span className="kyc-uploaded">{file.name}</span>
-        )}
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange(field)}
-          accept="image/*,.pdf"
-          style={{ display: 'none' }}
-        />
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -196,9 +131,9 @@ const KYC: React.FC = () => {
         </div>
         <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
           <div style={{ fontSize: '4rem', marginBottom: '16px' }}>⏳</div>
-          <h2 style={{ marginBottom: '12px' }}>We're Reviewing Your Documents</h2>
+          <h2 style={{ marginBottom: '12px' }}>We're Reviewing Your Information</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-            Our verification team is carefully reviewing your submitted documents. This usually takes 24-48 hours. You'll receive an email notification once the verification is complete.
+            Our verification team is carefully reviewing your submitted information. This usually takes 24-48 hours. You'll receive an email notification once the verification is complete.
           </p>
           <div className="progress-bar" style={{ height: '8px', marginBottom: '8px' }}>
             <div className="progress-fill" style={{ width: '60%' }}></div>
@@ -218,15 +153,11 @@ const KYC: React.FC = () => {
         </div>
         <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
           <div style={{ fontSize: '4rem', marginBottom: '16px' }}>❌</div>
-          <h2 style={{ marginBottom: '12px' }}>Documents Were Not Approved</h2>
+          <h2 style={{ marginBottom: '12px' }}>Verification Was Not Approved</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-            Unfortunately, the documents you submitted could not be verified. Please review the requirements below and resubmit your application with clear, valid documents.
+            Unfortunately, the information you submitted could not be verified. Please review your details and resubmit.
           </p>
-          <div className="alert alert-warning" style={{ textAlign: 'left', marginBottom: '24px' }}>
-            <i className="fas fa-lightbulb"></i>
-            <span>Make sure all documents are clearly visible, not expired, and match your registration details.</span>
-          </div>
-          <button className="btn btn-primary btn-lg" onClick={() => { setKycStatus(null); setCurrentStep(1); }}>
+          <button className="btn btn-primary btn-lg" onClick={() => { setKycStatus(null); }}>
             <i className="fas fa-redo"></i> Resubmit Application
           </button>
         </div>
@@ -245,119 +176,34 @@ const KYC: React.FC = () => {
       {error && <div className="alert alert-error"><i className="fas fa-circle-exclamation"></i>{error}</div>}
       {success && <div className="alert alert-success"><i className="fas fa-check-circle"></i>{success}</div>}
 
-      {/* Progress Steps */}
-      <div className="kyc-steps">
-        {[
-          { step: 1, label: 'Personal Info', icon: 'fa-user' },
-          { step: 2, label: 'Address', icon: 'fa-home' },
-          { step: 3, label: 'Documents', icon: 'fa-file' },
-        ].map(s => (
-          <div key={s.step} className={`kyc-step ${currentStep >= s.step ? 'active' : ''} ${currentStep > s.step ? 'completed' : ''}`}>
-            <div className="kyc-step-circle">
-              {currentStep > s.step ? '✓' : <i className={`fas ${s.icon}`}></i>}
+      {/* Personal Information - Simplified */}
+      <div className="card" style={{ padding: '32px' }}>
+        <h3 style={{ marginBottom: '24px', fontWeight: 700 }}>Personal Information</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          {personalFields.map(field => (
+            <div key={field.name} className="form-group" style={field.name === 'nationality' ? { gridColumn: '1 / -1' } : {}}>
+              <label className="form-label">{field.label}</label>
+              <input
+                type={field.type}
+                name={field.name}
+                value={(formData as any)[field.name]}
+                onChange={handleInputChange}
+                className="form-input"
+                placeholder={field.placeholder}
+              />
             </div>
-            <span className="kyc-step-label">{s.label}</span>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+          <button 
+            className="btn btn-primary btn-lg"
+            onClick={handleSubmitKyc}
+            disabled={isSubmitting || !formData.firstName || !formData.lastName || !formData.dateOfBirth || !formData.nationality}
+          >
+            {isSubmitting ? '⏳ Submitting...' : '✓ Submit Verification'}
+          </button>
+        </div>
       </div>
-
-      {/* Step 1: Personal Information */}
-      {currentStep === 1 && (
-        <div className="card" style={{ padding: '32px' }}>
-          <h3 style={{ marginBottom: '24px', fontWeight: 700 }}>Personal Information</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {stepFields.map(field => (
-              <div key={field.name} className="form-group" style={field.name === 'nationality' ? { gridColumn: '1 / -1' } : {}}>
-                <label className="form-label">{field.label}</label>
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={(formData as any)[field.name]}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder={field.placeholder}
-                />
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
-            <button className="btn btn-primary btn-lg" onClick={() => setCurrentStep(2)}>
-              Continue <i className="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Address */}
-      {currentStep === 2 && (
-        <div className="card" style={{ padding: '32px' }}>
-          <h3 style={{ marginBottom: '24px', fontWeight: 700 }}>Address Information</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {addressFields.map(field => (
-              <div key={field.name} className="form-group" style={['address', 'country'].includes(field.name) ? { gridColumn: '1 / -1' } : {}}>
-                <label className="form-label">{field.label}</label>
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={(formData as any)[field.name]}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder={field.placeholder}
-                />
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between' }}>
-            <button className="btn btn-ghost" onClick={() => setCurrentStep(1)}>
-              <i className="fas fa-arrow-left"></i> Back
-            </button>
-            <button className="btn btn-primary btn-lg" onClick={() => setCurrentStep(3)}>
-              Continue <i className="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 3: Document Upload */}
-      {currentStep === 3 && (
-        <div className="card" style={{ padding: '32px' }}>
-          <h3 style={{ marginBottom: '24px', fontWeight: 700 }}>Document Upload</h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>
-            Please upload clear, legible copies of the following documents. Accepted formats: JPG, PNG, PDF.
-          </p>
-          
-          <div className="kyc-doc-list">
-            {renderDocumentUpload('idFront', 'Government ID (Front)', 'Passport, Driver\'s License, or National ID')}
-            {renderDocumentUpload('idBack', 'Government ID (Back)', 'Back side of your ID document')}
-            {renderDocumentUpload('selfie', 'Selfie with ID', 'Take a selfie holding your ID document')}
-            {renderDocumentUpload('proofOfAddress', 'Proof of Address', 'Utility bill or bank statement (last 3 months)')}
-          </div>
-
-          <div className="kyc-requirements">
-            <h4 style={{ marginBottom: '12px', fontWeight: 600 }}>Document Requirements:</h4>
-            <ul style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 2 }}>
-              <li><i className="fas fa-check" style={{ color: 'var(--accent-primary)', marginRight: 8 }}></i>Documents must be valid and not expired</li>
-              <li><i className="fas fa-check" style={{ color: 'var(--accent-primary)', marginRight: 8 }}></i>All text must be clearly visible and readable</li>
-              <li><i className="fas fa-check" style={{ color: 'var(--accent-primary)', marginRight: 8 }}></i>No glare, shadows, or obstructions on documents</li>
-              <li><i className="fas fa-check" style={{ color: 'var(--accent-primary)', marginRight: 8 }}></i>Name on documents must match your registration</li>
-              <li><i className="fas fa-check" style={{ color: 'var(--accent-primary)', marginRight: 8 }}></i>Max file size: 10MB per document</li>
-            </ul>
-          </div>
-
-          <div style={{ marginTop: '28px', display: 'flex', justifyContent: 'space-between' }}>
-            <button className="btn btn-ghost" onClick={() => setCurrentStep(2)}>
-              <i className="fas fa-arrow-left"></i> Back
-            </button>
-            <button 
-              className="btn btn-primary btn-lg"
-              onClick={handleSubmitKyc}
-              disabled={isSubmitting || !documents.idFront || !documents.selfie}
-            >
-              {isSubmitting ? '⏳ Submitting...' : '✓ Submit Verification'}
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="kyc-security-note" style={{ textAlign: 'center', marginTop: '32px' }}>
         <i className="fas fa-lock" style={{ color: 'var(--accent-primary)', marginRight: 8 }}></i>

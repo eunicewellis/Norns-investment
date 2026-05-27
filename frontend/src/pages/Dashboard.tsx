@@ -113,13 +113,11 @@ const Dashboard: React.FC = () => {
       setUser(data);
       setActiveInvestments(data.activeInvestments);
       setCompletedInvestments(data.completedInvestments);
-      const totalProfit = data.activeInvestments.reduce((sum: number, inv: any) => sum + (inv.totalReturn || 0), 0) +
-        data.completedInvestments.reduce((sum: number, inv: any) => sum + (inv.totalReturn || 0), 0);
       const totalInvested = data.activeInvestments.reduce((sum: number, inv: any) => sum + inv.amount, 0) +
         data.completedInvestments.reduce((sum: number, inv: any) => sum + inv.amount, 0);
       setStats({
-        totalProfit: totalProfit.toFixed(2),
-        totalInvested: totalInvested.toFixed(2),
+        totalProfit: data.totalProfit || 0,
+        totalInvested: Number(totalInvested.toFixed(2)),
         totalWithdrawn: data.totalWithdrawn || 0,
         activeCount: data.activeInvestments.length,
         completedCount: data.completedInvestments.length

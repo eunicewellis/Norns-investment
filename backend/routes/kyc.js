@@ -89,15 +89,10 @@ router.post('/upload', auth, upload.single('document'), async (req, res) => {
   }
 });
 
-// Submit KYC application (handles individual document uploads)
-router.post('/submit', auth, upload.fields([
-  { name: 'idFront', maxCount: 1 },
-  { name: 'idBack', maxCount: 1 },
-  { name: 'selfie', maxCount: 1 },
-  { name: 'proofOfAddress', maxCount: 1 }
-]), async (req, res) => {
+// Submit KYC application (personal information only)
+router.post('/submit', auth, async (req, res) => {
   try {
-    const { firstName, lastName, dateOfBirth, nationality, address, city, state, postalCode, country, phoneNumber } = req.body;
+    const { firstName, lastName, dateOfBirth, nationality } = req.body;
     const decoded = req.user;
     const user = await User.findById(decoded.userId);
 
@@ -105,33 +100,31 @@ router.post('/submit', auth, upload.fields([
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const files = req.files || {};
-    const docTypes = [
-      { field: 'idFront', documentType: 'ID' },
-      { field: 'idBack', documentType: 'ID' },
-      { field: 'selfie', documentType: 'Selfie' },
-      { field: 'proofOfAddress', documentType: 'ProofOfAddress' }
-    ];
+    // Update user with KYC personal info
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
 
-    for (const { field, documentType } of docTypes) {
-      if (files[field] && files[field][0]) {
-        const file = files[field][0];
-        const kycDocument = new KycDocument({
-          userId: user._id,
-          documentType,
-          fileName: file.filename,
-          filePath: file.path,
-          status: 'pending'
-        });
-        await kycDocument.save();
-        user.kycDocuments.push(kycDocument._id);
+    // Create a KYC document entry to track the pending verification
+    const kycDocument = new KycDocument({
+      userId: user._id,
+      documentType: 'KYCInfo',
+      fileName: 'personal-info',
+      filePath: '',
+      status: 'pending',
+      metadata: {
+        firstName,
+        lastName,
+        dateOfBirth,
+        nationality
       }
-    }
+    });
+    await kycDocument.save();
+    user.kycDocuments.push(kycDocument._id);
 
     await user.save();
 
     res.json({
-      message: 'KYC documents submitted successfully! We will review them shortly.',
+      message: 'KYC information submitted successfully! We will review it shortly.',
       status: 'pending'
     });
   } catch (error) {

@@ -9,7 +9,7 @@ const kycDocumentSchema = new mongoose.Schema({
   documentType: {
     type: String,
     required: true,
-    enum: ['ID', 'Selfie', 'ProofOfAddress']
+    enum: ['ID', 'Selfie', 'ProofOfAddress', 'KYCInfo']
   },
   fileName: {
     type: String,
@@ -26,6 +26,9 @@ const kycDocumentSchema = new mongoose.Schema({
   },
   rejectionReason: {
     type: String
+  },
+  metadata: {
+    type: mongoose.Schema.Types.Mixed
   },
   createdAt: {
     type: Date,

@@ -123,6 +123,8 @@ router.get('/profile', auth, async (req, res) => {
       phone: user.phone,
       balance: user.balance,
       totalProfit: user.totalProfit,
+      totalDeposited: user.totalDeposited,
+      totalWithdrawn: user.totalWithdrawn,
       activeInvestments: user.activeInvestments,
       completedInvestments: user.completedInvestments,
       referralCode: user.referralCode,
