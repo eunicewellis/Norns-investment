@@ -10,6 +10,7 @@ interface User {
   email: string;
   phone: string;
   balance: number;
+  totalProfit?: number;
   totalDeposited: number;
   totalWithdrawn: number;
   status: string;
@@ -59,9 +60,14 @@ const Admin: React.FC = () => {
   // Edit user modal state
   const [editUser, setEditUser] = useState<User | null>(null);
   const [userBalance, setUserBalance] = useState(0);
+  const [userTotalProfit, setUserTotalProfit] = useState(0);
+  const [userTotalDeposited, setUserTotalDeposited] = useState(0);
+  const [userTotalWithdrawn, setUserTotalWithdrawn] = useState(0);
   const [userInvestments, setUserInvestments] = useState<Investment[]>([]);
   const [editMsg, setEditMsg] = useState('');
   const [editError, setEditError] = useState('');
+  // Currency picker for admin
+  const [adminCurr, setAdminCurr] = useState('$');
 
   // Edit investment modal state
   const [editInv, setEditInv] = useState<Investment | null>(null);
@@ -165,10 +171,16 @@ const Admin: React.FC = () => {
     navigate('/admin');
   };
 
+  // Currency symbols for admin editing
+  const adminCurrencies = ['$', '€', '£', '₿', '₹', '₦', 'R$', 'A$', 'C$', '¥', '₩', '₺', '₱', 'CHF', 'kr', 'S$', 'MX$', 'R', 'S/'];
+
   // Open edit user modal
   const openEditUser = async (user: User) => {
     setEditUser(user);
     setUserBalance(user.balance);
+    setUserTotalProfit(user.totalProfit || 0);
+    setUserTotalDeposited(user.totalDeposited || 0);
+    setUserTotalWithdrawn(user.totalWithdrawn || 0);
     setEditMsg('');
     setEditError('');
     try {
@@ -185,21 +197,26 @@ const Admin: React.FC = () => {
     }
   };
 
-  // Save user balance
-  const saveBalance = async () => {
+  // Save user finances
+  const saveFinance = async () => {
     setEditMsg('');
     setEditError('');
     if (!editUser) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}/admin/users/${editUser._id}/balance`, {
+      const res = await fetch(`${API_BASE_URL}/admin/users/${editUser._id}/finance`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ balance: userBalance })
+        body: JSON.stringify({
+          balance: userBalance,
+          totalProfit: userTotalProfit,
+          totalDeposited: userTotalDeposited,
+          totalWithdrawn: userTotalWithdrawn
+        })
       });
       const data = await res.json();
       if (res.ok) {
-        setEditMsg('Balance updated successfully!');
+        setEditMsg('Financial fields updated successfully!');
         fetchData();
       } else {
         setEditError(data.message || 'Failed');
@@ -302,13 +319,35 @@ const Admin: React.FC = () => {
           {editMsg && <div className="alert alert-success">{editMsg}</div>}
           {editError && <div className="alert alert-error">{editError}</div>}
 
-          {/* Balance */}
+          {/* Financial fields */}
           <div className="dashboard-card" style={{marginBottom:'20px'}}>
-            <h4 style={{fontWeight:600, marginBottom:'12px'}}>Balance</h4>
-            <div style={{display:'flex', gap:'12px', alignItems:'center'}}>
-              <input type="number" className="form-input" style={{flex:1}} value={userBalance} onChange={e => setUserBalance(Number(e.target.value))} />
-              <button className="btn btn-primary btn-sm" onClick={saveBalance}><i className="fas fa-save"></i> Save</button>
+            <h4 style={{fontWeight:600, marginBottom:'16px'}}>Financial Fields <span style={{fontWeight:400,fontSize:'0.8rem',color:'var(--text-tertiary)'}}>(click Save All to apply changes)</span></h4>
+            <div style={{display:'flex', gap:'8px', marginBottom:'12px', flexWrap:'wrap'}}>
+              {adminCurrencies.map(c => (
+                <button key={c} className={`btn btn-ghost btn-sm ${adminCurr === c ? 'btn-primary' : ''}`} onClick={() => setAdminCurr(c)}>{c}</button>
+              ))}
             </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+              <div className="form-group">
+                <label className="form-label">Available Balance ({adminCurr})</label>
+                <input type="number" className="form-input" value={userBalance} onChange={e => setUserBalance(Number(e.target.value))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Total Profit Earned ({adminCurr})</label>
+                <input type="number" className="form-input" value={userTotalProfit} onChange={e => setUserTotalProfit(Number(e.target.value))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Total Deposited ({adminCurr})</label>
+                <input type="number" className="form-input" value={userTotalDeposited} onChange={e => setUserTotalDeposited(Number(e.target.value))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Total Withdrawn ({adminCurr})</label>
+                <input type="number" className="form-input" value={userTotalWithdrawn} onChange={e => setUserTotalWithdrawn(Number(e.target.value))} />
+              </div>
+            </div>
+            <button className="btn btn-primary btn-sm" onClick={saveFinance} style={{marginTop:'12px'}}>
+              <i className="fas fa-save"></i> Save All Financial Fields
+            </button>
           </div>
 
           {/* Investments */}

@@ -106,20 +106,27 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
-// Update user balance
-router.put('/users/:id/balance', auth, async (req, res) => {
+// Update user financial fields (balance, totalProfit, totalDeposited, totalWithdrawn)
+router.put('/users/:id/finance', auth, async (req, res) => {
   try {
-    const { balance } = req.body;
-    if (balance === undefined || isNaN(balance)) {
-      return res.status(400).json({ message: 'Invalid balance value' });
+    const { balance, totalProfit, totalDeposited, totalWithdrawn } = req.body;
+    const updateData: any = {};
+    if (balance !== undefined && !isNaN(balance)) updateData.balance = balance;
+    if (totalProfit !== undefined && !isNaN(totalProfit)) updateData.totalProfit = totalProfit;
+    if (totalDeposited !== undefined && !isNaN(totalDeposited)) updateData.totalDeposited = totalDeposited;
+    if (totalWithdrawn !== undefined && !isNaN(totalWithdrawn)) updateData.totalWithdrawn = totalWithdrawn;
+    
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
     }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { balance },
+      updateData,
       { new: true }
     );
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'Balance updated', user });
+    res.json({ message: 'User financials updated', user });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
