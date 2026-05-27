@@ -11,7 +11,7 @@ const io = socketIo(server);
 
 // CORS - allow all origins (works with any domain)
 app.use(cors());
-app.options('*', cors());
+app.options('/*', cors());
 app.use(express.json());
 
 // Database connection
