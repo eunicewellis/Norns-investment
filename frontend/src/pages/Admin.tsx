@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import API_BASE_URL from '../config';
+import { allCurrencySymbols } from '../utils/currency';
 
 interface User {
   _id: string;
@@ -171,8 +172,8 @@ const Admin: React.FC = () => {
     navigate('/admin');
   };
 
-  // Currency symbols for admin editing
-  const adminCurrencies = ['$', '€', '£', '₿', '₹', '₦', 'R$', 'A$', 'C$', '¥', '₩', '₺', '₱', 'CHF', 'kr', 'S$', 'MX$', 'R', 'S/'];
+  // Currency symbols for admin editing (sourced from utils/currency)
+  const adminCurrencies = allCurrencySymbols;
 
   // Open edit user modal
   const openEditUser = async (user: User) => {
