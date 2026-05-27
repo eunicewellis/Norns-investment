@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import API_BASE_URL from '../config';
-import { allCurrencySymbols } from '../utils/currency';
+import { allCurrencyItems } from '../utils/currency';
 
 interface User {
   _id: string;
@@ -172,8 +172,8 @@ const Admin: React.FC = () => {
     navigate('/admin');
   };
 
-  // Currency symbols for admin editing (sourced from utils/currency)
-  const adminCurrencies = allCurrencySymbols;
+  // Currency items for admin editing (sourced from utils/currency)
+  const adminCurrencies = allCurrencyItems;
 
   // Open edit user modal
   const openEditUser = async (user: User) => {
@@ -324,8 +324,8 @@ const Admin: React.FC = () => {
           <div className="dashboard-card" style={{marginBottom:'20px'}}>
             <h4 style={{fontWeight:600, marginBottom:'16px'}}>Financial Fields <span style={{fontWeight:400,fontSize:'0.8rem',color:'var(--text-tertiary)'}}>(click Save All to apply changes)</span></h4>
             <div style={{display:'flex', gap:'8px', marginBottom:'12px', flexWrap:'wrap'}}>
-              {adminCurrencies.map(c => (
-                <button key={c} className={`btn btn-ghost btn-sm ${adminCurr === c ? 'btn-primary' : ''}`} onClick={() => setAdminCurr(c)}>{c}</button>
+              {adminCurrencies.map(item => (
+                <button key={item.code} className={`btn btn-ghost btn-sm ${adminCurr === item.symbol ? 'btn-primary' : ''}`} onClick={() => setAdminCurr(item.symbol)} title={item.code}>{item.label}</button>
               ))}
             </div>
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>

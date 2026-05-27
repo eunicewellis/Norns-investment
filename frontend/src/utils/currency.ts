@@ -104,15 +104,21 @@ export const countries = Object.keys(countryCurrencyMap);
 
 export const defaultCurrency: CurrencyInfo = { code: 'USD', symbol: '$', name: 'US Dollar' };
 
-// Unique currency symbols for admin panel
-export const allCurrencySymbols: string[] = [
-  '$', '€', '£', '¥', '₿', '₹', 'R$', 'A$', 'CA$', 'MX$', 'S$', 'HK$', 'NT$', 'B$', 'MOP$', 'RD$',
-  '₩', '₺', '₱', '₽', '₴', 'zł', 'Kč', 'CHF', 'kr', 'S/', '₨', '৳', 'Rp', '฿', '₫', '₮', '៛', '₭',
-  'د.إ', '﷼', 'د.ك', 'د.ب', 'د.ا', 'ل.ل', 'د.ع', '₪',
-  '$U', '₲', 'Bs.', '₡', 'B/.', 'Q', 'L', 'C$',
-  'Ft', 'lei', 'лв', 'дин', 'L', 'ден', 'KM', 'K',
-  'ރ.', 'R',
-];
+// Unique currency symbol + code pairs for admin panel (sorted by code)
+export const allCurrencyItems: { symbol: string; code: string; label: string }[] = (() => {
+  const seen = new Map<string, { symbol: string; code: string }>();
+  Object.values(countryCurrencyMap).forEach(c => {
+    if (!seen.has(c.code)) {
+      seen.set(c.code, { symbol: c.symbol, code: c.code });
+    }
+  });
+  return Array.from(seen.values())
+    .sort((a, b) => a.code.localeCompare(b.code))
+    .map(item => ({
+      ...item,
+      label: `${item.symbol} ${item.code}`
+    }));
+})();
 
 let cachedRates: Record<string, number> = {};
 let lastFetched = 0;
