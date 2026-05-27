@@ -9,20 +9,31 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Manual CORS middleware - most reliable approach
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
-});
+// CORS - allow both development and production origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://www.binextrading.com',
+  'https://binextrading.com',
+  'https://norns-investment-production.up.railway.app'
+];
 
-app.use(cors());
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all in dev, relax for production
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+}));
+
+// Handle preflight OPTIONS requests explicitly
+app.options('*', cors());
 app.use(express.json());
 
 // Database connection
