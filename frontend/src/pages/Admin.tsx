@@ -15,6 +15,8 @@ interface User {
   status: string;
   createdAt: string;
   referrals: any[];
+  activeInvestments: any[];
+  completedInvestments: any[];
 }
 
 interface Transaction {
@@ -27,6 +29,17 @@ interface Transaction {
   createdAt: string;
   planType?: string;
   walletAddress?: string;
+}
+
+interface Investment {
+  _id: string;
+  planType: string;
+  amount: number;
+  roiPercentage: number;
+  status: string;
+  startDate: string;
+  maturityDate: string;
+  createdAt: string;
 }
 
 type AdminTab = 'dashboard' | 'users' | 'transfers' | 'settings';
@@ -42,6 +55,21 @@ const Admin: React.FC = () => {
   const [passConfirm, setPassConfirm] = useState('');
   const [passMsg, setPassMsg] = useState('');
   const [passError, setPassError] = useState('');
+
+  // Edit user modal state
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [userBalance, setUserBalance] = useState(0);
+  const [userInvestments, setUserInvestments] = useState<Investment[]>([]);
+  const [editMsg, setEditMsg] = useState('');
+  const [editError, setEditError] = useState('');
+
+  // Edit investment modal state
+  const [editInv, setEditInv] = useState<Investment | null>(null);
+  const [invPlanType, setInvPlanType] = useState('');
+  const [invAmount, setInvAmount] = useState(0);
+  const [invRoi, setInvRoi] = useState(0);
+  const [invStatus, setInvStatus] = useState('active');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -137,6 +165,90 @@ const Admin: React.FC = () => {
     navigate('/admin');
   };
 
+  // Open edit user modal
+  const openEditUser = async (user: User) => {
+    setEditUser(user);
+    setUserBalance(user.balance);
+    setEditMsg('');
+    setEditError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/admin/users/${user._id}/investments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUserInvestments(data.investments || []);
+      }
+    } catch (e) {
+      setUserInvestments([]);
+    }
+  };
+
+  // Save user balance
+  const saveBalance = async () => {
+    setEditMsg('');
+    setEditError('');
+    if (!editUser) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/admin/users/${editUser._id}/balance`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ balance: userBalance })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEditMsg('Balance updated successfully!');
+        fetchData();
+      } else {
+        setEditError(data.message || 'Failed');
+      }
+    } catch (e) {
+      setEditError('Connection error');
+    }
+  };
+
+  // Open edit investment modal
+  const openEditInv = (inv: Investment) => {
+    setEditInv(inv);
+    setInvPlanType(inv.planType);
+    setInvAmount(inv.amount);
+    setInvRoi(inv.roiPercentage);
+    setInvStatus(inv.status);
+  };
+
+  // Save investment
+  const saveInvestment = async () => {
+    if (!editInv || !editUser) return;
+    setEditMsg('');
+    setEditError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/admin/users/${editUser._id}/investments`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          investmentId: editInv._id,
+          planType: invPlanType,
+          amount: invAmount,
+          roiPercentage: invRoi,
+          status: invStatus
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEditMsg('Investment updated!');
+        setEditInv(null);
+        openEditUser(editUser);
+      } else {
+        setEditError(data.message || 'Failed');
+      }
+    } catch (e) {
+      setEditError('Connection error');
+    }
+  };
+
   const getDashboardStats = () => {
     const totalUsers = users.length;
     const totalDeposits = transactions.filter(t => t.type === 'deposit').reduce((sum, t) => sum + t.amount, 0);
@@ -174,6 +286,115 @@ const Admin: React.FC = () => {
     { key: 'transfers', label: 'Transfers', icon: 'fa-arrow-right-arrow-left' },
     { key: 'settings', label: 'Settings', icon: 'fa-gear' },
   ];
+
+  // Edit user modal
+  const renderEditModal = () => {
+    if (!editUser) return null;
+    return (
+      <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000, padding:'20px'}} onClick={() => setEditUser(null)}>
+        <div className="card" style={{maxWidth:'700px', width:'100%', maxHeight:'80vh', overflowY:'auto', padding:'32px'}} onClick={e => e.stopPropagation()}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
+            <h3 style={{fontWeight:700, fontSize:'1.2rem'}}>Edit User: {editUser.firstName} {editUser.lastName}</h3>
+            <button className="btn btn-ghost btn-sm" onClick={() => setEditUser(null)}><i className="fas fa-times"></i></button>
+          </div>
+          <p style={{color:'var(--text-secondary)', fontSize:'0.85rem', marginBottom:'20px'}}>{editUser.email}</p>
+
+          {editMsg && <div className="alert alert-success">{editMsg}</div>}
+          {editError && <div className="alert alert-error">{editError}</div>}
+
+          {/* Balance */}
+          <div className="dashboard-card" style={{marginBottom:'20px'}}>
+            <h4 style={{fontWeight:600, marginBottom:'12px'}}>Balance</h4>
+            <div style={{display:'flex', gap:'12px', alignItems:'center'}}>
+              <input type="number" className="form-input" style={{flex:1}} value={userBalance} onChange={e => setUserBalance(Number(e.target.value))} />
+              <button className="btn btn-primary btn-sm" onClick={saveBalance}><i className="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+
+          {/* Investments */}
+          <div className="dashboard-card">
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px'}}>
+              <h4 style={{fontWeight:600}}>Investments ({userInvestments.length})</h4>
+            </div>
+            {userInvestments.length === 0 ? (
+              <p style={{color:'var(--text-tertiary)', fontSize:'0.85rem'}}>No investments found for this user.</p>
+            ) : (
+              <div className="table-container">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Plan</th>
+                      <th>Amount</th>
+                      <th>ROI %</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userInvestments.map(inv => (
+                      <tr key={inv._id}>
+                        <td style={{fontWeight:600}}>{inv.planType}</td>
+                        <td>${inv.amount?.toLocaleString()}</td>
+                        <td>{inv.roiPercentage}%</td>
+                        <td><span className={`tx-status ${inv.status}`}>{inv.status}</span></td>
+                        <td>
+                          <button className="admin-action-btn" onClick={() => openEditInv(inv)}>
+                            <i className="fas fa-edit"></i> Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Edit Investment Modal (nested) */}
+          {editInv && (
+            <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, padding:'20px'}} onClick={() => setEditInv(null)}>
+              <div className="card" style={{maxWidth:'450px', width:'100%', padding:'28px'}} onClick={e => e.stopPropagation()}>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px'}}>
+                  <h4 style={{fontWeight:700}}>Edit Investment</h4>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setEditInv(null)}><i className="fas fa-times"></i></button>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Plan Type</label>
+                  <select className="form-select" value={invPlanType} onChange={e => setInvPlanType(e.target.value)}>
+                    <option value="Starter">Starter</option>
+                    <option value="Premium">Premium</option>
+                    <option value="VIP">VIP</option>
+                    <option value="Bitcoin Max">Bitcoin Max</option>
+                    <option value="Crypto Whale">Crypto Whale</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Amount ($)</label>
+                  <input type="number" className="form-input" value={invAmount} onChange={e => setInvAmount(Number(e.target.value))} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">ROI (%)</label>
+                  <input type="number" className="form-input" value={invRoi} onChange={e => setInvRoi(Number(e.target.value))} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Status</label>
+                  <select className="form-select" value={invStatus} onChange={e => setInvStatus(e.target.value)}>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+                <button className="btn btn-primary btn-full" onClick={saveInvestment}>
+                  <i className="fas fa-save"></i> Update Investment
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const renderDashboard = () => (
     <>
@@ -294,7 +515,6 @@ const Admin: React.FC = () => {
               <th>Deposits</th>
               <th>Referrals</th>
               <th>Status</th>
-              <th>Joined</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -307,20 +527,25 @@ const Admin: React.FC = () => {
                 <td style={{fontWeight:600}}>${user.totalDeposited?.toLocaleString() || '0'}</td>
                 <td>{user.referrals?.length || 0}</td>
                 <td><span className={`tx-status ${user.status === 'active' ? 'active' : 'suspended'}`}>{user.status}</span></td>
-                <td style={{color:'var(--text-tertiary)'}}>{new Date(user.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <button 
-                    className={`admin-action-btn ${user.status === 'active' ? 'reject' : 'approve'}`}
-                    onClick={() => toggleUserStatus(user._id, user.status)}
-                  >
-                    {user.status === 'active' ? 'Suspend' : 'Activate'}
-                  </button>
+                  <div style={{display:'flex', gap:'6px', flexWrap:'wrap'}}>
+                    <button className="admin-action-btn approve" onClick={() => openEditUser(user)} title="Edit Balance & Investments">
+                      <i className="fas fa-edit"></i> Edit
+                    </button>
+                    <button 
+                      className={`admin-action-btn ${user.status === 'active' ? 'reject' : 'approve'}`}
+                      onClick={() => toggleUserStatus(user._id, user.status)}
+                    >
+                      {user.status === 'active' ? 'Suspend' : 'Activate'}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {renderEditModal()}
     </>
   );
 

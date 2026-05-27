@@ -106,6 +106,82 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
+// Update user balance
+router.put('/users/:id/balance', auth, async (req, res) => {
+  try {
+    const { balance } = req.body;
+    if (balance === undefined || isNaN(balance)) {
+      return res.status(400).json({ message: 'Invalid balance value' });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { balance },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'Balance updated', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Update user investment (create or edit)
+router.put('/users/:id/investments', auth, async (req, res) => {
+  try {
+    const { investmentId, planType, amount, roiPercentage, status, action } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (action === 'create') {
+      const newInvestment = new Investment({
+        userId: user._id,
+        planType: planType || 'Starter',
+        amount: amount || 0,
+        type: 'investment',
+        roiPercentage: roiPercentage || 0,
+        status: status || 'active',
+        startDate: new Date(),
+        maturityDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days default
+      });
+      const saved = await newInvestment.save();
+      user.activeInvestments.push(saved._id);
+      await user.save();
+      return res.json({ message: 'Investment created', investment: saved });
+    }
+
+    const investment = await Investment.findById(investmentId);
+    if (!investment) return res.status(404).json({ message: 'Investment not found' });
+    if (investment.userId.toString() !== user._id.toString()) {
+      return res.status(400).json({ message: 'Investment does not belong to this user' });
+    }
+
+    if (planType !== undefined) investment.planType = planType;
+    if (amount !== undefined) investment.amount = amount;
+    if (roiPercentage !== undefined) investment.roiPercentage = roiPercentage;
+    if (status !== undefined) investment.status = status;
+
+    await investment.save();
+    res.json({ message: 'Investment updated', investment });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get user investments
+router.get('/users/:id/investments', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const allIds = [...(user.activeInvestments || []), ...(user.completedInvestments || [])];
+    const investments = await Investment.find({ _id: { $in: allIds } }).sort({ createdAt: -1 });
+
+    res.json({ investments });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Toggle user status
 router.put('/users/:id/status', auth, async (req, res) => {
   try {
