@@ -55,9 +55,24 @@ router.put('/password', auth, async (req, res) => {
       return res.status(400).json({ message: 'New password must be at least 6 characters' });
     }
 
-    // Update password in environment (this won't persist across restarts in .env, 
-    // but we store it in a simple way that the running process can use)
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Update password in current process
     process.env.ADMIN_PASSWORD = newPassword;
+    
+    // Persist to .env file so it survives server restarts
+    const envPath = path.join(__dirname, '..', '.env');
+    try {
+      let envContent = fs.readFileSync(envPath, 'utf8');
+      envContent = envContent.replace(
+        /^ADMIN_PASSWORD=.*$/m,
+        `ADMIN_PASSWORD=${newPassword}`
+      );
+      fs.writeFileSync(envPath, envContent, 'utf8');
+    } catch (err) {
+      console.error('Failed to persist password to .env file:', err.message);
+    }
     
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
