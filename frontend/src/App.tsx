@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 
 // Pages
@@ -36,37 +36,46 @@ function HomeOrRedirect() {
   return <Home />;
 }
 
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  return (
+    <div className="App">
+      <ScrollToTop />
+      {!isAdminRoute && <Navbar />}
+      <main>
+        <Routes>
+          <Route path="/" element={<HomeOrRedirect />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/markets" element={<Markets />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/deposit" element={<Deposit />} />
+          <Route path="/withdrawal" element={<Withdrawal />} />
+          <Route path="/referral" element={<Referral />} />
+          <Route path="/kyc" element={<KYC />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/mobile-app" element={<MobileApp />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<Admin />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
-      <div className="App">
-        <ScrollToTop />
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<HomeOrRedirect />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/markets" element={<Markets />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/deposit" element={<Deposit />} />
-            <Route path="/withdrawal" element={<Withdrawal />} />
-            <Route path="/referral" element={<Referral />} />
-            <Route path="/kyc" element={<KYC />} />
-            <Route path="/support" element={<Support />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/mobile-app" element={<MobileApp />} />
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<Admin />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <AppContent />
     </Router>
   );
 }

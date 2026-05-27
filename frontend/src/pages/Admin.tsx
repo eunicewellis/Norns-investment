@@ -29,21 +29,12 @@ interface Transaction {
   walletAddress?: string;
 }
 
-interface DepositMethod {
-  _id: string;
-  name: string;
-  type: string;
-  address: string;
-  active: boolean;
-}
-
-type AdminTab = 'dashboard' | 'users' | 'transfers' | 'deposits' | 'withdrawals' | 'settings';
+type AdminTab = 'dashboard' | 'users' | 'transfers' | 'settings';
 
 const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [users, setUsers] = useState<User[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [depositMethods, setDepositMethods] = useState<DepositMethod[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passCurrent, setPassCurrent] = useState('');
@@ -85,10 +76,9 @@ const Admin: React.FC = () => {
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      const [usersRes, transRes, methodsRes] = await Promise.all([
+      const [usersRes, transRes] = await Promise.all([
         fetch(`${API_BASE_URL}/admin/users`, { headers }),
-        fetch(`${API_BASE_URL}/admin/transactions`, { headers }),
-        fetch(`${API_BASE_URL}/admin/deposit-methods`, { headers })
+        fetch(`${API_BASE_URL}/admin/transactions`, { headers })
       ]);
 
       if (usersRes.ok) {
@@ -98,10 +88,6 @@ const Admin: React.FC = () => {
       if (transRes.ok) {
         const transData = await transRes.json();
         setTransactions(transData.transactions || []);
-      }
-      if (methodsRes.ok) {
-        const methodsData = await methodsRes.json();
-        setDepositMethods(methodsData.methods || []);
       }
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -147,7 +133,8 @@ const Admin: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem('admin_authenticated');
+    navigate('/admin');
   };
 
   const getDashboardStats = () => {
@@ -185,8 +172,6 @@ const Admin: React.FC = () => {
     { key: 'dashboard', label: 'Dashboard', icon: 'fa-chart-pie' },
     { key: 'users', label: 'Users', icon: 'fa-users' },
     { key: 'transfers', label: 'Transfers', icon: 'fa-arrow-right-arrow-left' },
-    { key: 'deposits', label: 'Deposits', icon: 'fa-circle-dollar' },
-    { key: 'withdrawals', label: 'Withdrawals', icon: 'fa-paper-plane' },
     { key: 'settings', label: 'Settings', icon: 'fa-gear' },
   ];
 
@@ -241,14 +226,7 @@ const Admin: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" />
               <XAxis dataKey="month" stroke="var(--text-tertiary)" />
               <YAxis stroke="var(--text-tertiary)" />
-              <Tooltip
-                contentStyle={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)'
-                }}
-              />
+              <Tooltip contentStyle={{background:'var(--bg-card)',border:'1px solid var(--border-primary)',borderRadius:'8px',color:'var(--text-primary)'}} />
               <Area type="monotone" dataKey="deposits" stroke="var(--accent-primary)" fill="url(#colorDeposits)" strokeWidth={2} />
               <Area type="monotone" dataKey="withdrawals" stroke="var(--accent-danger)" fill="none" strokeWidth={2} />
             </AreaChart>
@@ -261,14 +239,7 @@ const Admin: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" />
               <XAxis dataKey="month" stroke="var(--text-tertiary)" />
               <YAxis stroke="var(--text-tertiary)" />
-              <Tooltip
-                contentStyle={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)'
-                }}
-              />
+              <Tooltip contentStyle={{background:'var(--bg-card)',border:'1px solid var(--border-primary)',borderRadius:'8px',color:'var(--text-primary)'}} />
               <Bar dataKey="users" fill="var(--accent-primary)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -390,124 +361,27 @@ const Admin: React.FC = () => {
     </>
   );
 
-  const renderDeposits = () => (
-    <>
-      <div className="admin-section-header">
-        <h2>Deposit Management</h2>
-      </div>
-
-      <div className="admin-section-header" style={{marginTop:'24px'}}>
-        <h3 style={{fontSize:'1.1rem',fontWeight:600}}>Deposit Methods</h3>
-      </div>
-      <div className="table-container" style={{marginBottom:'28px'}}>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Address/Details</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {depositMethods.map(method => (
-              <tr key={method._id}>
-                <td style={{fontWeight:600}}>{method.name}</td>
-                <td>{method.type}</td>
-                <td style={{color:'var(--text-tertiary)',fontSize:'0.8rem',maxWidth:'200px',overflow:'hidden',textOverflow:'ellipsis'}}>{method.address}</td>
-                <td><span className={`tx-status ${method.active ? 'active' : 'suspended'}`}>{method.active ? 'Active' : 'Inactive'}</span></td>
-                <td>
-                  <button className="admin-action-btn">Edit</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="admin-section-header">
-        <h3 style={{fontSize:'1.1rem',fontWeight:600}}>Deposit History</h3>
-      </div>
-      <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Amount</th>
-              <th>Method</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.filter(t => t.type === 'deposit').map((deposit: any) => (
-              <tr key={deposit._id}>
-                <td style={{fontWeight:600}}>{deposit.userId?.firstName} {deposit.userId?.lastName}</td>
-                <td style={{fontWeight:600}}>${deposit.amount?.toLocaleString()}</td>
-                <td style={{color:'var(--text-tertiary)'}}>{deposit.method || '-'}</td>
-                <td><span className={`tx-status ${deposit.status}`}>{deposit.status}</span></td>
-                <td style={{color:'var(--text-tertiary)'}}>{new Date(deposit.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <div style={{display:'flex', gap:'6px'}}>
-                    {deposit.status === 'pending' && (
-                      <>
-                        <button className="admin-action-btn approve" onClick={() => handleStatusUpdate(deposit._id, 'deposit', 'completed')}>
-                          <i className="fas fa-check"></i>
-                        </button>
-                        <button className="admin-action-btn reject" onClick={() => handleStatusUpdate(deposit._id, 'deposit', 'rejected')}>
-                          <i className="fas fa-times"></i>
-                        </button>
-                      </>
-                    )}
-                    <span className={`tx-status ${deposit.status}`}>{deposit.status}</span>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPassMsg('');
     setPassError('');
-
-    if (passNew !== passConfirm) {
-      setPassError('New passwords do not match');
-      return;
-    }
-    if (passNew.length < 6) {
-      setPassError('Password must be at least 6 characters');
-      return;
-    }
-
+    if (passNew !== passConfirm) { setPassError('New passwords do not match'); return; }
+    if (passNew.length < 6) { setPassError('Password must be at least 6 characters'); return; }
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/admin/password`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ currentPassword: passCurrent, newPassword: passNew })
       });
       const data = await res.json();
       if (res.ok) {
         setPassMsg('Password changed successfully!');
-        setPassCurrent('');
-        setPassNew('');
-        setPassConfirm('');
+        setPassCurrent(''); setPassNew(''); setPassConfirm('');
       } else {
         setPassError(data.message || 'Failed to change password');
       }
-    } catch (err) {
-      setPassError('Connection error');
-    }
+    } catch (err) { setPassError('Connection error'); }
   };
 
   const renderSettings = () => (
@@ -535,66 +409,11 @@ const Admin: React.FC = () => {
     </div>
   );
 
-  const renderWithdrawals = () => (
-    <>
-      <div className="admin-section-header">
-        <h2>Withdrawal Management</h2>
-        <span className="admin-count" style={{color:'var(--accent-warning)'}}>
-          {transactions.filter(t => t.type === 'withdrawal' && t.status === 'pending').length} pending
-        </span>
-      </div>
-      <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Amount</th>
-              <th>Method</th>
-              <th>Wallet</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.filter(t => t.type === 'withdrawal').map((withdrawal: any) => (
-              <tr key={withdrawal._id}>
-                <td style={{fontWeight:600}}>{withdrawal.userId?.firstName} {withdrawal.userId?.lastName}</td>
-                <td style={{fontWeight:600}}>${withdrawal.amount?.toLocaleString()}</td>
-                <td style={{color:'var(--text-tertiary)'}}>{withdrawal.method || 'BTC'}</td>
-                <td style={{color:'var(--text-tertiary)',fontSize:'0.8rem',maxWidth:'150px',overflow:'hidden',textOverflow:'ellipsis'}}>{withdrawal.walletAddress || '-'}</td>
-                <td><span className={`tx-status ${withdrawal.status}`}>{withdrawal.status}</span></td>
-                <td style={{color:'var(--text-tertiary)'}}>{new Date(withdrawal.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <div style={{display:'flex', gap:'6px'}}>
-                    {withdrawal.status === 'pending' && (
-                      <>
-                        <button className="admin-action-btn approve" onClick={() => handleStatusUpdate(withdrawal._id, 'withdrawal', 'completed')}>
-                          <i className="fas fa-check"></i>
-                        </button>
-                        <button className="admin-action-btn reject" onClick={() => handleStatusUpdate(withdrawal._id, 'withdrawal', 'rejected')}>
-                          <i className="fas fa-times"></i>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-
   return (
     <div className="admin-layout">
-      {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar-header">
-          <div className="admin-sidebar-logo">
-            <i className="fas fa-chart-line"></i>
-          </div>
+          <div className="admin-sidebar-logo"><i className="fas fa-chart-line"></i></div>
           <div>
             <div className="admin-sidebar-title">NORNS</div>
             <div className="admin-sidebar-badge">Admin</div>
@@ -602,36 +421,26 @@ const Admin: React.FC = () => {
         </div>
         <nav style={{flex:1}}>
           {sidebarTabs.map(tab => (
-            <button
-              key={tab.key}
-              className={`admin-nav-item ${activeTab === tab.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
+            <button key={tab.key} className={`admin-nav-item ${activeTab === tab.key ? 'active' : ''}`} onClick={() => setActiveTab(tab.key)}>
               <i className={`fas ${tab.icon}`}></i>
               <span>{tab.label}</span>
             </button>
           ))}
         </nav>
         <button className="admin-nav-item" onClick={handleLogout} style={{marginTop:'auto',color:'var(--accent-danger)'}}>
-          <i className="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
+          <i className="fas fa-sign-out-alt"></i><span>Logout</span>
         </button>
       </aside>
 
-      {/* Main Content */}
       <div className="admin-main-content">
         <header className="admin-header">
           <h2 className="admin-header-title">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
-          <div className="admin-header-right">
-            <div className="admin-avatar">A</div>
-          </div>
+          <div className="admin-header-right"><div className="admin-avatar">A</div></div>
         </header>
         <div className="admin-content">
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'users' && renderUsers()}
           {activeTab === 'transfers' && renderTransfers()}
-          {activeTab === 'deposits' && renderDeposits()}
-          {activeTab === 'withdrawals' && renderWithdrawals()}
           {activeTab === 'settings' && renderSettings()}
         </div>
       </div>
