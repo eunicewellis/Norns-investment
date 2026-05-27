@@ -21,6 +21,7 @@ import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
 import MobileApp from './pages/MobileApp';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
 
 // Components
 import Navbar from './components/Navbar';
@@ -59,7 +60,8 @@ function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/mobile-app" element={<MobileApp />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

@@ -39,6 +39,32 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Change admin password
+router.put('/password', auth, async (req, res) => {
+  try {
+    if (!req.user.admin) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    const { currentPassword, newPassword } = req.body;
+    
+    if (currentPassword !== process.env.ADMIN_PASSWORD) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+    
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+
+    // Update password in environment (this won't persist across restarts in .env, 
+    // but we store it in a simple way that the running process can use)
+    process.env.ADMIN_PASSWORD = newPassword;
+    
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Check admin auth
 router.get('/check', auth, async (req, res) => {
   try {

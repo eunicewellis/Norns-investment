@@ -37,7 +37,7 @@ interface DepositMethod {
   active: boolean;
 }
 
-type AdminTab = 'dashboard' | 'users' | 'transfers' | 'deposits' | 'withdrawals';
+type AdminTab = 'dashboard' | 'users' | 'transfers' | 'deposits' | 'withdrawals' | 'settings';
 
 const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -46,6 +46,11 @@ const Admin: React.FC = () => {
   const [depositMethods, setDepositMethods] = useState<DepositMethod[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passCurrent, setPassCurrent] = useState('');
+  const [passNew, setPassNew] = useState('');
+  const [passConfirm, setPassConfirm] = useState('');
+  const [passMsg, setPassMsg] = useState('');
+  const [passError, setPassError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -182,6 +187,7 @@ const Admin: React.FC = () => {
     { key: 'transfers', label: 'Transfers', icon: 'fa-arrow-right-arrow-left' },
     { key: 'deposits', label: 'Deposits', icon: 'fa-circle-dollar' },
     { key: 'withdrawals', label: 'Withdrawals', icon: 'fa-paper-plane' },
+    { key: 'settings', label: 'Settings', icon: 'fa-gear' },
   ];
 
   const renderDashboard = () => (
@@ -466,6 +472,69 @@ const Admin: React.FC = () => {
     </>
   );
 
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPassMsg('');
+    setPassError('');
+
+    if (passNew !== passConfirm) {
+      setPassError('New passwords do not match');
+      return;
+    }
+    if (passNew.length < 6) {
+      setPassError('Password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/admin/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword: passCurrent, newPassword: passNew })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPassMsg('Password changed successfully!');
+        setPassCurrent('');
+        setPassNew('');
+        setPassConfirm('');
+      } else {
+        setPassError(data.message || 'Failed to change password');
+      }
+    } catch (err) {
+      setPassError('Connection error');
+    }
+  };
+
+  const renderSettings = () => (
+    <div style={{maxWidth:'500px'}}>
+      <h2 style={{fontSize:'1.3rem',fontWeight:700,marginBottom:'24px'}}>Change Admin Password</h2>
+      {passMsg && <div className="alert alert-success">{passMsg}</div>}
+      {passError && <div className="alert alert-error">{passError}</div>}
+      <form onSubmit={handlePasswordChange}>
+        <div className="form-group">
+          <label className="form-label">Current Password</label>
+          <input type="password" className="form-input" value={passCurrent} onChange={e => setPassCurrent(e.target.value)} placeholder="Enter current password" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">New Password</label>
+          <input type="password" className="form-input" value={passNew} onChange={e => setPassNew(e.target.value)} placeholder="Enter new password (min 6 characters)" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Confirm New Password</label>
+          <input type="password" className="form-input" value={passConfirm} onChange={e => setPassConfirm(e.target.value)} placeholder="Confirm new password" />
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={!passCurrent || !passNew || !passConfirm}>
+          <i className="fas fa-save"></i> Update Password
+        </button>
+      </form>
+    </div>
+  );
+
   const renderWithdrawals = () => (
     <>
       <div className="admin-section-header">
@@ -563,6 +632,7 @@ const Admin: React.FC = () => {
           {activeTab === 'transfers' && renderTransfers()}
           {activeTab === 'deposits' && renderDeposits()}
           {activeTab === 'withdrawals' && renderWithdrawals()}
+          {activeTab === 'settings' && renderSettings()}
         </div>
       </div>
     </div>
