@@ -236,27 +236,33 @@ const Admin: React.FC = () => {
     setInvStatus(inv.status);
   };
 
-  // Save investment
+  // Save investment (create or update)
   const saveInvestment = async () => {
     if (!editInv || !editUser) return;
     setEditMsg('');
     setEditError('');
+    const isNew = !editInv._id;
     try {
       const token = localStorage.getItem('token');
+      const body: any = {
+        planType: invPlanType,
+        amount: invAmount,
+        roiPercentage: invRoi,
+        status: invStatus
+      };
+      if (isNew) {
+        body.action = 'create';
+      } else {
+        body.investmentId = editInv._id;
+      }
       const res = await fetch(`${API_BASE_URL}/admin/users/${editUser._id}/investments`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          investmentId: editInv._id,
-          planType: invPlanType,
-          amount: invAmount,
-          roiPercentage: invRoi,
-          status: invStatus
-        })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (res.ok) {
-        setEditMsg('Investment updated!');
+        setEditMsg(isNew ? 'Investment created!' : 'Investment updated!');
         setEditInv(null);
         openEditUser(editUser);
       } else {
@@ -355,6 +361,15 @@ const Admin: React.FC = () => {
           <div className="dashboard-card">
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px'}}>
               <h4 style={{fontWeight:600}}>Investments ({userInvestments.length})</h4>
+              <button className="btn btn-primary btn-sm" onClick={() => {
+                setEditInv({ _id: '', planType: 'Starter', amount: 0, roiPercentage: 0, status: 'active', startDate: '', maturityDate: '', createdAt: '' });
+                setInvPlanType('Starter');
+                setInvAmount(0);
+                setInvRoi(0);
+                setInvStatus('active');
+              }}>
+                <i className="fas fa-plus"></i> Create
+              </button>
             </div>
             {userInvestments.length === 0 ? (
               <p style={{color:'var(--text-tertiary)', fontSize:'0.85rem'}}>No investments found for this user.</p>
@@ -395,7 +410,7 @@ const Admin: React.FC = () => {
             <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, padding:'20px'}} onClick={() => setEditInv(null)}>
               <div className="card" style={{maxWidth:'450px', width:'100%', padding:'28px'}} onClick={e => e.stopPropagation()}>
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px'}}>
-                  <h4 style={{fontWeight:700}}>Edit Investment</h4>
+                  <h4 style={{fontWeight:700}}>{editInv._id ? 'Edit' : 'Create'} Investment</h4>
                   <button className="btn btn-ghost btn-sm" onClick={() => setEditInv(null)}><i className="fas fa-times"></i></button>
                 </div>
                 <div className="form-group">
