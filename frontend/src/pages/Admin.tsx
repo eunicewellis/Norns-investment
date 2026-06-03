@@ -400,7 +400,7 @@ const Admin: React.FC = () => {
                     {userInvestments.map(inv => (
                       <tr key={inv._id}>
                         <td style={{fontWeight:600}}>{inv.planType}</td>
-                        <td>${inv.amount?.toLocaleString()}</td>
+                        <td>{adminCurr}{inv.amount?.toLocaleString()}</td>
                         <td>{inv.roiPercentage}%</td>
                         <td><span className={`tx-status ${inv.status}`}>{inv.status}</span></td>
                         <td>
@@ -435,7 +435,7 @@ const Admin: React.FC = () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Amount ($)</label>
+                  <label className="form-label">Amount ({adminCurr})</label>
                   <input type="number" className="form-input" value={invAmount} onChange={e => setInvAmount(Number(e.target.value))} />
                 </div>
                 <div className="form-group">
