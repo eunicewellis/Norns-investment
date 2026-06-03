@@ -372,7 +372,18 @@ const Admin: React.FC = () => {
               </button>
             </div>
             {userInvestments.length === 0 ? (
-              <p style={{color:'var(--text-tertiary)', fontSize:'0.85rem'}}>No investments found for this user.</p>
+              <div style={{textAlign:'center', padding:'20px 0'}}>
+                <p style={{color:'var(--text-tertiary)', fontSize:'0.85rem', marginBottom:'12px'}}>No investments found for this user.</p>
+                <button className="btn btn-primary btn-sm" onClick={() => {
+                  setEditInv({ _id: '', planType: 'Starter', amount: 0, roiPercentage: 0, status: 'active', startDate: '', maturityDate: '', createdAt: '' });
+                  setInvPlanType('Starter');
+                  setInvAmount(0);
+                  setInvRoi(0);
+                  setInvStatus('active');
+                }}>
+                  <i className="fas fa-plus"></i> Create First Investment
+                </button>
+              </div>
             ) : (
               <div className="table-container">
                 <table className="table">
