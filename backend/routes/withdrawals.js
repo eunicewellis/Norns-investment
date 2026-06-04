@@ -52,24 +52,9 @@ router.post('/create', auth, async (req, res) => {
       return res.status(400).json({ message: 'Invalid amount' });
     }
 
-    // Check method limits
-    const methodsMap = {
-      'Bank Transfer': { minAmount: 100, maxAmount: 10000, processingTime: '3-5 business days' },
-      'Cryptocurrency': { minAmount: 50, maxAmount: 5000, processingTime: '1-2 business days' },
-      'E-Wallet': { minAmount: 20, maxAmount: 2000, processingTime: '24 hours' }
-    };
-
-    const selectedMethod = methodsMap[method];
-    if (!selectedMethod) {
-      return res.status(400).json({ message: 'Invalid withdrawal method' });
-    }
-
-    if (amount < selectedMethod.minAmount) {
-      return res.status(400).json({ message: `Minimum amount for ${method} is $${selectedMethod.minAmount}` });
-    }
-
-    if (amount > selectedMethod.maxAmount) {
-      return res.status(400).json({ message: `Maximum amount for ${method} is $${selectedMethod.maxAmount}` });
+    // Check minimum amount ($20)
+    if (amount < 20) {
+      return res.status(400).json({ message: 'Minimum withdrawal amount is $20' });
     }
 
     // Check user balance
@@ -106,7 +91,7 @@ router.post('/create', auth, async (req, res) => {
         createdAt: withdrawal.createdAt
       },
       newBalance: user.balance,
-      processingTime: selectedMethod.processingTime
+      processingTime: '24-72 hours'
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
