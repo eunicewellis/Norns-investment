@@ -104,7 +104,11 @@ const Withdrawal: React.FC = () => {
 
       if (response.ok) {
         setSuccess(`Withdrawal request for $${parseFloat(amount).toLocaleString()} has been processed successfully!`);
-        setTimeout(() => { navigate('/dashboard'); }, 3000);
+        setTimeout(() => {
+          navigate('/dashboard', {
+            state: { withdrawalSuccess: `Withdrawal request for $${parseFloat(amount).toLocaleString()} has been processed successfully!` }
+          });
+        }, 2000);
       } else {
         setError(data.message);
       }

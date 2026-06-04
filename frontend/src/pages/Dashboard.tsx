@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import API_BASE_URL from '../config';
 import { getStoredCurrency, countries, getCurrencyForCountry, fetchExchangeRates, convertPrice } from '../utils/currency';
@@ -26,7 +26,21 @@ const Dashboard: React.FC = () => {
     completedCount: 0,
     balance: 0
   });
+  const location = useLocation();
   const navigate = useNavigate();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Show toast from navigation state (e.g. after withdrawal)
+  useEffect(() => {
+    if (location.state && (location.state as any).withdrawalSuccess) {
+      setToastMsg((location.state as any).withdrawalSuccess);
+      // Clear the state so it doesn't show again on re-render
+      window.history.replaceState({}, document.title);
+      // Auto-dismiss after 4 seconds
+      const timer = setTimeout(() => setToastMsg(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -169,6 +183,12 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {toastMsg && (
+        <div className="alert alert-success" style={{marginBottom:'20px', animation:'fadeIn 0.3s'}}>
+          <i className="fas fa-check-circle"></i> {toastMsg}
+        </div>
+      )}
 
       {cryptoPrices.length > 0 && (
       <div className="dashboard-card" style={{marginBottom:'28px'}}>
