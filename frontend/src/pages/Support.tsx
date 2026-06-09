@@ -2,16 +2,16 @@ import React from 'react';
 
 declare global {
   interface Window {
-    smartsupp: any;
+    Tawk_API: any;
   }
 }
 
 const Support: React.FC = () => {
   const openChat = () => {
-    if (typeof window.smartsupp !== 'undefined') {
-      window.smartsupp('chat:open');
+    if (typeof window.Tawk_API !== 'undefined') {
+      window.Tawk_API.maximize();
     } else {
-      window.open('https://www.smartsuppchat.com', '_blank', 'noopener,noreferrer');
+      window.open('https://www.tawk.to', '_blank', 'noopener,noreferrer');
     }
   };
 

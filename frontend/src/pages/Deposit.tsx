@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 declare global {
   interface Window {
-    smartsupp: any;
+    Tawk_API: any;
   }
 }
 
@@ -11,10 +11,10 @@ const Deposit: React.FC = () => {
   const navigate = useNavigate();
 
   const openChat = () => {
-    if (typeof window.smartsupp !== 'undefined') {
-      window.smartsupp('chat:open');
+    if (typeof window.Tawk_API !== 'undefined') {
+      window.Tawk_API.maximize();
     } else {
-      window.open('https://www.smartsuppchat.com', '_blank', 'noopener,noreferrer');
+      window.open('https://www.tawk.to', '_blank', 'noopener,noreferrer');
     }
   };
 
