@@ -250,7 +250,7 @@ const Withdrawal: React.FC = () => {
           <div className="summary-item"><span>Method:</span><span>{method === 'bank' ? 'Bank Transfer' : method === 'cashapp' ? 'CashApp' : method === 'paypal' ? 'PayPal' : method === 'bitcoin' ? 'Bitcoin' : '-'}</span></div>
           <div className="summary-item"><span>Amount:</span><span>${parseFloat(amount || '0').toLocaleString()}</span></div>
           <div className="summary-item"><span>Processing Fee:</span><span>0%</span></div>
-          <div className="summary-item"><span>Processing Time:</span><span>24-72 hours</span></div>
+          <div className="summary-item"><span>Status:</span><span>Processing</span></div>
         </div>
 
         <button className="btn btn-primary btn-lg btn-full" onClick={handleWithdrawal}
