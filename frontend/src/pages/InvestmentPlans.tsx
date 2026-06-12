@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
+import { getStoredCurrency, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 interface Plan {
   id: string;
@@ -23,7 +24,11 @@ const InvestmentPlans: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isInvesting, setIsInvesting] = useState(false);
+  const [currency, setCurrency] = useState(getStoredCurrency());
   const navigate = useNavigate();
+
+  const csym = () => currency.symbol;
+  const cval = (usdAmt: number) => convertPrice(usdAmt, currency.code);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -36,6 +41,10 @@ const InvestmentPlans: React.FC = () => {
       }
     };
     fetchPlans();
+    fetchExchangeRates();
+    const handleStorage = () => setCurrency(getStoredCurrency());
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   const handlePlanSelect = (plan: Plan) => {
@@ -48,7 +57,7 @@ const InvestmentPlans: React.FC = () => {
   const handleInvest = async () => {
     if (!selectedPlan) return;
     if (!amount || parseFloat(amount) < selectedPlan.minAmount) {
-      setError(`Minimum amount for ${selectedPlan.type} is $${selectedPlan.minAmount}`);
+      setError(`Minimum amount for ${selectedPlan.type} is ${csym()}${cval(selectedPlan.minAmount).toLocaleString()}`);
       return;
     }
 
@@ -108,8 +117,8 @@ const InvestmentPlans: React.FC = () => {
             </div>
             <p className="plan-description">{plan.description}</p>
             <div className="plan-limits">
-              <span>Min: ${plan.minAmount.toLocaleString()}</span>
-              <span>Max: ${plan.maxAmount.toLocaleString()}</span>
+              <span>Min: {csym()}{cval(plan.minAmount).toLocaleString()}</span>
+              <span>Max: {csym()}{cval(plan.maxAmount).toLocaleString()}</span>
             </div>
             <ul className="plan-features">
               {plan.features.map((f, i) => (
@@ -132,22 +141,22 @@ const InvestmentPlans: React.FC = () => {
           <div className="investment-form-card">
             <h2>Invest in {selectedPlan.type}</h2>
             <div className="form-group">
-              <label>Investment Amount (USD)</label>
+              <label>Investment Amount ({currency.code})</label>
               <input
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder={`Min: $${selectedPlan.minAmount}`}
+                placeholder={`Min: ${csym()}${cval(selectedPlan.minAmount).toLocaleString()}`}
                 min={selectedPlan.minAmount}
               />
-              <small>Minimum: ${selectedPlan.minAmount.toLocaleString()} | Maximum: ${selectedPlan.maxAmount.toLocaleString()}</small>
+              <small>Minimum: {csym()}{cval(selectedPlan.minAmount).toLocaleString()} | Maximum: {csym()}{cval(selectedPlan.maxAmount).toLocaleString()}</small>
             </div>
 
             <div className="investment-summary">
               <h3>Profit Projection</h3>
               <div className="summary-row">
                 <span>Investment:</span>
-                <span>${parseFloat(amount || '0').toLocaleString()}</span>
+                <span>{csym()}{cval(parseFloat(amount || '0')).toLocaleString()}</span>
               </div>
               <div className="summary-row">
                 <span>ROI:</span>
@@ -155,15 +164,15 @@ const InvestmentPlans: React.FC = () => {
               </div>
               <div className="summary-row">
                 <span>Expected Return:</span>
-                <span className="gold">${(parseFloat(amount || '0') * (1 + selectedPlan.roi / 100)).toLocaleString()}</span>
+                <span className="gold">{csym()}{cval(parseFloat(amount || '0') * (1 + selectedPlan.roi / 100)).toLocaleString()}</span>
               </div>
               <div className="summary-row">
                 <span>Net Profit:</span>
-                <span className="gold">${(parseFloat(amount || '0') * selectedPlan.roi / 100).toLocaleString()}</span>
+                <span className="gold">{csym()}{cval(parseFloat(amount || '0') * selectedPlan.roi / 100).toLocaleString()}</span>
               </div>
               <div className="summary-row">
                 <span>Daily Profit:</span>
-                <span>${(parseFloat(amount || '0') * selectedPlan.roi / 100 / selectedPlan.lockupPeriod).toFixed(2)}</span>
+                <span>{csym()}{cval(parseFloat(amount || '0') * selectedPlan.roi / 100 / selectedPlan.lockupPeriod).toFixed(2)}</span>
               </div>
               <div className="summary-row">
                 <span>Duration:</span>

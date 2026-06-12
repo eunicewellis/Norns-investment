@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
+import { getStoredCurrency, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 declare global {
   interface Window { Tawk_API: any; }
@@ -12,7 +13,11 @@ const Portfolio: React.FC = () => {
   const [activeInvestments, setActiveInvestments] = useState([]);
   const [completedInvestments, setCompletedInvestments] = useState([]);
   const [error, setError] = useState('');
+  const [currency, setCurrency] = useState(getStoredCurrency());
   const navigate = useNavigate();
+
+  const csym = () => currency.symbol;
+  const cval = (usdAmt: number) => convertPrice(usdAmt, currency.code);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -48,6 +53,10 @@ const Portfolio: React.FC = () => {
     };
 
     fetchUserData();
+    fetchExchangeRates();
+    const handleStorage = () => setCurrency(getStoredCurrency());
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [navigate]);
 
   if (isLoading) {
@@ -71,12 +80,12 @@ const Portfolio: React.FC = () => {
       <div className="portfolio-stats">
         <div className="stat-card">
           <div className="stat-icon">💰</div>
-          <div className="stat-value">${user.balance.toLocaleString()}</div>
+          <div className="stat-value">{csym()}{cval(user.balance).toLocaleString()}</div>
           <div className="stat-label">Total Balance</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">📈</div>
-          <div className="stat-value">${user.totalProfit.toLocaleString()}</div>
+          <div className="stat-value">{csym()}{cval(user.totalProfit).toLocaleString()}</div>
           <div className="stat-label">Total Profit</div>
         </div>
         <div className="stat-card">
@@ -107,7 +116,7 @@ const Portfolio: React.FC = () => {
               <div className="investment-details">
                 <div className="detail-item">
                   <span className="detail-label">Amount:</span>
-                  <span className="detail-value">${investment.amount.toLocaleString()}</span>
+                  <span className="detail-value">{csym()}{cval(investment.amount).toLocaleString()}</span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">ROI:</span>
@@ -119,7 +128,7 @@ const Portfolio: React.FC = () => {
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Daily Profit:</span>
-                  <span className="detail-value">${((investment.amount * investment.roiPercentage / 100 / 30)).toFixed(2)}</span>
+                  <span className="detail-value">{csym()}{cval((investment.amount * investment.roiPercentage / 100 / 30)).toFixed(2)}</span>
                 </div>
               </div>
               <div className="investment-progress">
@@ -165,7 +174,7 @@ const Portfolio: React.FC = () => {
               <div className="investment-details">
                 <div className="detail-item">
                   <span className="detail-label">Amount:</span>
-                  <span className="detail-value">${investment.amount.toLocaleString()}</span>
+                  <span className="detail-value">{csym()}{cval(investment.amount).toLocaleString()}</span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">ROI:</span>
@@ -173,11 +182,11 @@ const Portfolio: React.FC = () => {
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Total Return:</span>
-                  <span className="detail-value">${investment.totalReturn.toLocaleString()}</span>
+                  <span className="detail-value">{csym()}{cval(investment.totalReturn).toLocaleString()}</span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Profit:</span>
-                  <span className="detail-value">+${(investment.totalReturn - investment.amount).toLocaleString()}</span>
+                  <span className="detail-value">+{csym()}{cval(investment.totalReturn - investment.amount).toLocaleString()}</span>
                 </div>
               </div>
               <div className="investment-actions">

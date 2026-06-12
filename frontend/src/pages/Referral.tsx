@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
+import { getStoredCurrency, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 const Referral: React.FC = () => {
   const [referralCode, setReferralCode] = useState('');
@@ -14,7 +15,11 @@ const Referral: React.FC = () => {
   });
   const [copySuccess, setCopySuccess] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currency, setCurrency] = useState(getStoredCurrency());
   const navigate = useNavigate();
+
+  const csym = () => currency.symbol;
+  const cval = (usdAmt: number) => convertPrice(usdAmt, currency.code);
 
   const commissionRates = [
     { level: 'Level 1', rate: '10%', description: 'Direct referrals earn 10% commission on their deposits' },
@@ -41,6 +46,10 @@ const Referral: React.FC = () => {
       setReferralCode(demoCode);
       setReferralLink(`${window.location.origin}/register?ref=${demoCode}`);
     }
+    fetchExchangeRates();
+    const handleStorage = () => setCurrency(getStoredCurrency());
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   const fetchReferralData = async () => {
@@ -116,14 +125,14 @@ const Referral: React.FC = () => {
           <div className="stat-card">
             <div className="stat-icon amber"><i className="fas fa-coins"></i></div>
             <div className="stat-content">
-              <div className="stat-value">${referralStats.totalEarned.toLocaleString()}</div>
+              <div className="stat-value">{csym()}{cval(referralStats.totalEarned).toLocaleString()}</div>
               <div className="stat-label">Total Earned</div>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon purple"><i className="fas fa-clock"></i></div>
             <div className="stat-content">
-              <div className="stat-value">${referralStats.pendingCommissions.toLocaleString()}</div>
+              <div className="stat-value">{csym()}{cval(referralStats.pendingCommissions).toLocaleString()}</div>
               <div className="stat-label">Pending Commissions</div>
             </div>
           </div>
@@ -299,8 +308,8 @@ const Referral: React.FC = () => {
                   <tr key={i}>
                     <td>{ref.name}</td>
                     <td>{new Date(ref.dateJoined).toLocaleDateString()}</td>
-                    <td>${ref.depositAmount.toLocaleString()}</td>
-                    <td className="price-up">+${ref.commission.toLocaleString()}</td>
+                    <td>{csym()}{cval(ref.depositAmount).toLocaleString()}</td>
+                    <td className="price-up">+{csym()}{cval(ref.commission).toLocaleString()}</td>
                     <td><span className={`tx-status ${ref.status === 'active' ? 'active' : ref.status === 'pending' ? 'pending' : 'completed'}`}>{ref.status}</span></td>
                   </tr>
                 ))}

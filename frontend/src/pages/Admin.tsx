@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import API_BASE_URL from '../config';
-import { allCurrencyItems } from '../utils/currency';
+import { allCurrencyItems, getStoredCurrency } from '../utils/currency';
 
 interface User {
   _id: string;
@@ -68,7 +68,10 @@ const Admin: React.FC = () => {
   const [editMsg, setEditMsg] = useState('');
   const [editError, setEditError] = useState('');
   // Currency picker for admin
-  const [adminCurr, setAdminCurr] = useState('$');
+  const storedCurr = getStoredCurrency();
+  const [adminCurr, setAdminCurr] = useState(storedCurr.symbol);
+  const [globalCurr] = useState(storedCurr);
+  const gsym = () => globalCurr.symbol;
 
   // Edit investment modal state
   const [editInv, setEditInv] = useState<Investment | null>(null);
@@ -478,7 +481,7 @@ const Admin: React.FC = () => {
             <span className="stat-label">Total Deposits</span>
             <i className="fas fa-circle-dollar" style={{color:'var(--accent-secondary)'}}></i>
           </div>
-          <div className="stat-value">${stats.totalDeposits.toLocaleString()}</div>
+          <div className="stat-value">{gsym()}{stats.totalDeposits.toLocaleString()}</div>
           <div className="stat-trend up"><i className="fas fa-arrow-up"></i> +23%</div>
         </div>
         <div className="admin-stat-card">
@@ -486,7 +489,7 @@ const Admin: React.FC = () => {
             <span className="stat-label">Total Withdrawals</span>
             <i className="fas fa-paper-plane" style={{color:'var(--accent-warning)'}}></i>
           </div>
-          <div className="stat-value">${stats.totalWithdrawals.toLocaleString()}</div>
+          <div className="stat-value">{gsym()}{stats.totalWithdrawals.toLocaleString()}</div>
           <div className="stat-trend warn"><i className="fas fa-minus"></i> Stable</div>
         </div>
         <div className="admin-stat-card">
@@ -553,7 +556,7 @@ const Admin: React.FC = () => {
               <tr key={tx._id}>
                 <td style={{fontWeight:600}}>{tx.userId?.firstName} {tx.userId?.lastName}</td>
                 <td><span className={`tx-status ${tx.type === 'deposit' ? 'completed' : 'pending'}`}>{tx.type}</span></td>
-                <td style={{fontWeight:600}}>${tx.amount?.toLocaleString()}</td>
+                <td style={{fontWeight:600}}>{gsym()}{tx.amount?.toLocaleString()}</td>
                 <td style={{color:'var(--text-tertiary)'}}>{tx.method || '-'}</td>
                 <td><span className={`tx-status ${tx.status}`}>{tx.status}</span></td>
                 <td style={{color:'var(--text-tertiary)'}}>{new Date(tx.createdAt).toLocaleDateString()}</td>
@@ -589,8 +592,8 @@ const Admin: React.FC = () => {
               <tr key={user._id}>
                 <td style={{fontWeight:600}}>{user.firstName} {user.lastName}</td>
                 <td style={{color:'var(--text-tertiary)'}}>{user.email}</td>
-                <td style={{fontWeight:600}}>${user.balance?.toLocaleString()}</td>
-                <td style={{fontWeight:600}}>${user.totalDeposited?.toLocaleString() || '0'}</td>
+                <td style={{fontWeight:600}}>{gsym()}{user.balance?.toLocaleString()}</td>
+                <td style={{fontWeight:600}}>{gsym()}{user.totalDeposited?.toLocaleString() || '0'}</td>
                 <td>{user.referrals?.length || 0}</td>
                 <td><span className={`tx-status ${user.status === 'active' ? 'active' : 'suspended'}`}>{user.status}</span></td>
                 <td>
@@ -639,7 +642,7 @@ const Admin: React.FC = () => {
               <tr key={tx._id}>
                 <td style={{fontWeight:600}}>{tx.userId?.firstName} {tx.userId?.lastName}</td>
                 <td><span className={`tx-status ${tx.type === 'deposit' ? 'completed' : 'pending'}`}>{tx.type}</span></td>
-                <td style={{fontWeight:600}}>${tx.amount?.toLocaleString()}</td>
+                <td style={{fontWeight:600}}>{gsym()}{tx.amount?.toLocaleString()}</td>
                 <td style={{color:'var(--text-tertiary)'}}>{tx.method || '-'}</td>
                 <td style={{color:'var(--text-tertiary)'}}>{tx.planType || '-'}</td>
                 <td><span className={`tx-status ${tx.status}`}>{tx.status}</span></td>

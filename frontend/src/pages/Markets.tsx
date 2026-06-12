@@ -149,7 +149,7 @@ const Markets: React.FC = () => {
           <span className="ticker-label">🔥 LIVE</span>
           {cryptos.map((c, i) => (
             <span key={i} className="ticker-item">
-              {c.icon} {c.symbol} <span className={c.change >= 0 ? 'green' : 'red'}>${c.price?.toFixed(2)}</span>
+              {c.icon} {c.symbol} <span className={c.change >= 0 ? 'green' : 'red'}>{currency.symbol}{c.price?.toFixed(2)}</span>
               <span className={c.change >= 0 ? 'green' : 'red'}>({c.change >= 0 ? '+' : ''}{c.change?.toFixed(2)}%)</span>
             </span>
           ))}

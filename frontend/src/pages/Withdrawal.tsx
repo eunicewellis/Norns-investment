@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../config';
+import { getStoredCurrency, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 const countries = [
   'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'United States', 'United Kingdom',
@@ -31,11 +32,22 @@ const Withdrawal: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [kycVerified, setKycVerified] = useState<boolean | null>(null);
   const [checkingKyc, setCheckingKyc] = useState(true);
+  const [currency, setCurrency] = useState(getStoredCurrency());
   const navigate = useNavigate();
 
   useEffect(() => {
     checkKycStatus();
+    fetchExchangeRates();
+    const stored = getStoredCurrency();
+    setCurrency(stored);
+    // Listen for currency changes
+    const handleStorage = () => setCurrency(getStoredCurrency());
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
+
+  const csym = () => currency.symbol;
+  const cval = (usdAmt: number) => convertPrice(usdAmt, currency.code);
 
   const checkKycStatus = async () => {
     try {
@@ -59,7 +71,7 @@ const Withdrawal: React.FC = () => {
 
   const handleWithdrawal = async () => {
     if (!amount || parseFloat(amount) < 20) {
-      setError('Minimum withdrawal amount is $20');
+      setError(`Minimum withdrawal amount is ${csym()}${cval(20).toLocaleString()}`);
       return;
     }
     if (!method) {
@@ -103,10 +115,11 @@ const Withdrawal: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(`Withdrawal request for $${parseFloat(amount).toLocaleString()} has been processed successfully!`);
+        const convertedAmt = cval(parseFloat(amount));
+        setSuccess(`Withdrawal request for ${csym()}${convertedAmt.toLocaleString()} has been processed successfully!`);
         setTimeout(() => {
           navigate('/dashboard', {
-            state: { withdrawalSuccess: `Withdrawal request for $${parseFloat(amount).toLocaleString()} has been processed successfully!` }
+            state: { withdrawalSuccess: `Withdrawal request for ${csym()}${convertedAmt.toLocaleString()} has been processed successfully!` }
           });
         }, 2000);
       } else {
@@ -198,8 +211,8 @@ const Withdrawal: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Amount (USD)</label>
-          <input type="number" className="form-input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount (min: $20)" min={20} />
+          <label className="form-label">Amount ({currency.code})</label>
+          <input type="number" className="form-input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={`Enter amount (min: ${csym()}${cval(20).toLocaleString()})`} min={20} />
         </div>
 
         {/* Bank Transfer Fields */}
@@ -248,7 +261,7 @@ const Withdrawal: React.FC = () => {
         <div className="withdrawal-summary" style={{margin:'24px 0'}}>
           <h4>Withdrawal Summary</h4>
           <div className="summary-item"><span>Method:</span><span>{method === 'bank' ? 'Bank Transfer' : method === 'cashapp' ? 'CashApp' : method === 'paypal' ? 'PayPal' : method === 'bitcoin' ? 'Bitcoin' : '-'}</span></div>
-          <div className="summary-item"><span>Amount:</span><span>${parseFloat(amount || '0').toLocaleString()}</span></div>
+          <div className="summary-item"><span>Amount:</span><span>{csym()}{cval(parseFloat(amount || '0')).toLocaleString()}</span></div>
           <div className="summary-item"><span>Processing Fee:</span><span>0%</span></div>
           <div className="summary-item"><span>Status:</span><span>Processing</span></div>
         </div>
