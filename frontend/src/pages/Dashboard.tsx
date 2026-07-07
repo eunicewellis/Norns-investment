@@ -5,7 +5,7 @@ import API_BASE_URL from '../config';
 import { getStoredCurrency, countries, getCurrencyForCountry, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 declare global {
-  interface Window { Tawk_API: any; }
+  interface Window { smartsupp: any; }
 }
 
 const Dashboard: React.FC = () => {
@@ -258,7 +258,7 @@ const Dashboard: React.FC = () => {
           <div className="quick-actions-grid">
             <button className="quick-action-btn" onClick={() => navigate('/deposit')}><i className="fas fa-credit-card"></i> Make Deposit</button>
             <button className="quick-action-btn" onClick={() => navigate('/withdrawal')}><i className="fas fa-paper-plane"></i> Request Withdrawal</button>
-            <button className="quick-action-btn" onClick={() => { if (typeof window.Tawk_API !== 'undefined') window.Tawk_API.maximize(); else window.open('https://www.tawk.to', '_blank'); }}><i className="fas fa-rocket"></i> New Investment</button>
+            <button className="quick-action-btn" onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsupp.com', '_blank'); }}><i className="fas fa-rocket"></i> New Investment</button>
             <button className="quick-action-btn" onClick={() => navigate('/portfolio')}><i className="fas fa-chart-pie"></i> Portfolio</button>
           </div>
         </div>
@@ -324,7 +324,7 @@ const Dashboard: React.FC = () => {
             <div style={{textAlign:'center', padding:'32px', color:'var(--text-tertiary)'}}>
               <i className="fas fa-inbox" style={{fontSize:'2rem',marginBottom:'12px',display:'block'}}></i>
               <p style={{marginBottom:'16px'}}>You don't have any active investments yet.</p>
-              <button onClick={() => { if (typeof window.Tawk_API !== 'undefined') window.Tawk_API.maximize(); else window.open('https://www.tawk.to', '_blank'); }} className="btn btn-primary">Contact Support</button>
+              <button onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsupp.com', '_blank'); }} className="btn btn-primary">Contact Support</button>
             </div>
           )}
         </div>

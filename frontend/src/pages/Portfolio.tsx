@@ -4,7 +4,7 @@ import API_BASE_URL from '../config';
 import { getStoredCurrency, fetchExchangeRates, convertPrice } from '../utils/currency';
 
 declare global {
-  interface Window { Tawk_API: any; }
+  interface Window { smartsupp: any; }
 }
 
 const Portfolio: React.FC = () => {
@@ -152,7 +152,7 @@ const Portfolio: React.FC = () => {
           {activeInvestments.length === 0 && (
             <div className="no-investments">
               <p>You don't have any active investments yet.</p>
-              <button onClick={() => { if (typeof window.Tawk_API !== 'undefined') window.Tawk_API.maximize(); else window.open('https://www.tawk.to', '_blank'); }} className="btn btn-primary">Contact Support</button>
+              <button onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsupp.com', '_blank'); }} className="btn btn-primary">Contact Support</button>
             </div>
           )}
         </div>
@@ -197,7 +197,7 @@ const Portfolio: React.FC = () => {
           {completedInvestments.length === 0 && (
             <div className="no-investments">
               <p>You don't have any completed investments yet.</p>
-              <button onClick={() => { if (typeof window.Tawk_API !== 'undefined') window.Tawk_API.maximize(); else window.open('https://www.tawk.to', '_blank'); }} className="btn btn-primary">Contact Support</button>
+              <button onClick={() => { if (typeof window.smartsupp !== 'undefined') window.smartsupp('chat:open'); else window.open('https://www.smartsupp.com', '_blank'); }} className="btn btn-primary">Contact Support</button>
             </div>
           )}
         </div>
